@@ -26,12 +26,27 @@ def extract_text_from_pdf(file_path: str) -> str:
     try:
         doc = fitz.open(file_path)
         text_parts = []
+        links = []
+        
         for page in doc:
             page_text = page.get_text()
             if isinstance(page_text, str):
                 text_parts.append(page_text)
+            
+            try:
+                for link in page.get_links():
+                    if 'uri' in link:
+                        links.append(link['uri'])
+            except:
+                pass
+        
+        text = "".join(text_parts)
+        
+        if links:
+            text += "\n\nExtracted Links:\n" + "\n".join(links)
+        
         doc.close()
-        return "".join(text_parts)
+        return text
     except Exception as e:
         raise Exception(f"Error parsing PDF: {str(e)}")
 
@@ -40,7 +55,31 @@ def extract_text_from_docx(file_path: str) -> str:
     try:
         if Document is not None:
             doc = Document(file_path)
-            text = "\n".join([para.text for para in doc.paragraphs])
+            text_parts = []
+            links = []
+            
+            for para in doc.paragraphs:
+                text_parts.append(para.text)
+                
+                for run in para.runs:
+                    if hasattr(run, 'element') and hasattr(run.element, 'xpath'):
+                        try:
+                            hyperlinks = run.element.xpath('.//w:hyperlink/@r:id')
+                            for hl_id in hyperlinks:
+                                try:
+                                    rel = doc.part.rels[hl_id]
+                                    if hasattr(rel, 'target_ref'):
+                                        links.append(rel.target_ref)
+                                except:
+                                    pass
+                        except:
+                            pass
+            
+            text = "\n".join(text_parts)
+            
+            if links:
+                text += "\n\nExtracted Links:\n" + "\n".join(set(links))
+            
             return text
         elif docx2txt is not None:
             return docx2txt.process(file_path)
@@ -110,17 +149,38 @@ def extract_urls(text: str) -> Dict[str, List[str]]:
         'portfolio': []
     }
     
+    text_lower = text.lower()
+    
     linkedin_pattern = r'(?:https?://)?(?:www\.)?linkedin\.com/in/[\w-]+'
     github_pattern = r'(?:https?://)?(?:www\.)?github\.com/[\w-]+'
+    kaggle_pattern = r'(?:https?://)?(?:www\.)?kaggle\.com/[\w-]+'
     url_pattern = r'https?://(?:www\.)?[\w\-\.]+\.[\w]{2,}(?:/[\w\-\./?%&=]*)?'
     
     urls['linkedin'] = re.findall(linkedin_pattern, text, re.IGNORECASE)
     urls['github'] = re.findall(github_pattern, text, re.IGNORECASE)
     
+    kaggle_urls = re.findall(kaggle_pattern, text, re.IGNORECASE)
+    if kaggle_urls:
+        urls['portfolio'].extend(kaggle_urls)
+    
+    if 'linkedin' in text_lower and not urls['linkedin']:
+        urls['linkedin'].append('linkedin_detected')
+    
+    if 'github' in text_lower and not urls['github']:
+        urls['github'].append('github_detected')
+    
+    portfolio_keywords = ['kaggle', 'portfolio', 'website', 'blog', 'medium.com', 
+                         'dev.to', 'personal site', 'homepage']
+    for keyword in portfolio_keywords:
+        if keyword in text_lower and not urls['portfolio']:
+            urls['portfolio'].append(f'{keyword}_detected')
+            break
+    
     all_urls = re.findall(url_pattern, text, re.IGNORECASE)
     for url in all_urls:
         if 'linkedin.com' not in url.lower() and 'github.com' not in url.lower():
-            urls['portfolio'].append(url)
+            if url not in urls['portfolio']:
+                urls['portfolio'].append(url)
     
     return urls
 
