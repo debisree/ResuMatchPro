@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Resume Quality Analyzer{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/app" class="text-xl font-bold text-gray-800">Resume Quality Analyzer</a>
+                {% if username %}
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, {{ username }}</span>
+                    <a href="/app/history" class="text-blue-600 hover:text-blue-800">History</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="max-w-4xl mx-auto px-4 py-8 text-center text-gray-500 text-sm">
+        <p>Resume Quality Analyzer - Helping you improve your resume</p>
+    </footer>
+</body>
+</html>

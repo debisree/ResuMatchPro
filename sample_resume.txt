@@ -1,0 +1,48 @@
+John Doe
+Email: john.doe@email.com | Phone: (555) 123-4567
+LinkedIn: linkedin.com/in/johndoe | GitHub: github.com/johndoe
+
+SUMMARY
+Results-driven Data Scientist with 3 years of experience building machine learning models for healthcare applications. Skilled in Python, SQL, and TensorFlow. Improved patient prediction accuracy by 25% and reduced processing time by 40% through model optimization.
+
+EXPERIENCE
+
+Data Scientist | HealthTech Inc. | January 2022 - Present
+- Developed predictive models for patient readmission risk, achieving 85% accuracy
+- Reduced model inference time by 40% through optimization techniques
+- Collaborated with cross-functional teams to deploy 5 ML models to production
+- Analyzed datasets with over 1M patient records using SQL and Python
+- Presented insights to stakeholders and executive leadership
+
+Junior Data Analyst | MedData Solutions | June 2020 - December 2021
+- Built dashboards in Tableau to visualize patient outcomes and trends
+- Automated data processing pipelines, saving 15 hours per week
+- Conducted statistical analysis on clinical trial data
+- Created reports for research teams and physicians
+
+EDUCATION
+
+Master of Science in Data Science | University of California | 2020
+- GPA: 3.8/4.0
+- Thesis: "Machine Learning Applications in Healthcare Diagnosis"
+
+Bachelor of Science in Computer Science | State University | 2018
+- Cum Laude
+
+SKILLS
+
+Programming: Python, R, SQL
+ML/AI: TensorFlow, PyTorch, scikit-learn, XGBoost
+Data Tools: Pandas, NumPy, Jupyter, Git
+Visualization: Tableau, Matplotlib, Seaborn
+Cloud: AWS (S3, SageMaker), basic Docker
+
+PROJECTS
+
+Medical Image Classification System
+- Built CNN model using TensorFlow to classify X-ray images with 92% accuracy
+- Deployed model as REST API using Flask and Docker
+
+CERTIFICATIONS
+
+AWS Certified Machine Learning - Specialty | 2023
