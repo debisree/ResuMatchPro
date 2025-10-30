@@ -129,19 +129,20 @@ async def analyze_resume(
 ):
     session_id = get_session_id(request)
     
-    if not validate_filename(file.filename):
+    filename = file.filename or "unknown"
+    if not validate_filename(filename):
         raise HTTPException(status_code=400, detail="Invalid file type or filename")
     
     contents = await file.read()
     if len(contents) > MAX_FILE_SIZE:
         raise HTTPException(status_code=400, detail="File too large (max 5MB)")
     
-    file_path = os.path.join(UPLOAD_DIR, f"{uuid.uuid4()}_{file.filename}")
+    file_path = os.path.join(UPLOAD_DIR, f"{uuid.uuid4()}_{filename}")
     with open(file_path, "wb") as f:
         f.write(contents)
     
     try:
-        resume_text = parse_resume(file_path, file.filename)
+        resume_text = parse_resume(file_path, filename)
         resume_text = normalize_text(resume_text)
         
         analyzer = ResumeAnalyzer(resume_text, target_role, seniority_goal)
@@ -161,12 +162,12 @@ async def analyze_resume(
             session_id,
             target_role,
             seniority_goal,
-            file.filename,
+            filename,
             analysis_result
         )
         
         analysis_result['id'] = analysis_id
-        analysis_result['filename'] = file.filename
+        analysis_result['filename'] = filename
         
         os.remove(file_path)
         
