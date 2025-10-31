@@ -56,6 +56,13 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-10-31: **Role Alignment Upgrade** - Now uses real job descriptions for 10 predefined tech roles:
+  - Added job_descriptions.py with comprehensive JDs for Data Science, MLE, AI Engineer, Full Stack, Software Engineer, Backend, Frontend, DevOps, Cloud Architect, Technology Manager, Data Analyst
+  - Updated home.html to use dropdown select (instead of text input) for target role
+  - Enhanced requirement extraction with curated keyword library (200+ tech terms) + strict pattern matching
+  - Uses camelCase/PascalCase extraction (TensorFlow, PyTorch) + ALLCAPS acronyms (AWS, GCP, ML, AI) with comprehensive blacklist filtering
+  - Removed noisy extractors (parenthetical, hyphen-term) that captured legal/benefits boilerplate
+  - Added Role Alignment section in results UI showing matched skills, gaps, and alignment percentage
 - 2025-10-31: Enhanced URL detection - detects hyperlinked keywords (LinkedIn, GitHub, Kaggle) even when URLs are hidden
 - 2025-10-31: Added detailed section-by-section feedback below overall score (Contacts/Links, Summary, Education, Employment, Misc)
 - 2025-10-31: Sharpened analysis rules with specific point breakdowns (e.g., "Missing 8 points: Add 3 more metrics...")
