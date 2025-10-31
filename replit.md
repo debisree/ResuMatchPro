@@ -56,6 +56,23 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-10-31: **💰 Salary Analysis & Market Insights** - Location-based salary analysis with visualization:
+  - Added location field to upload form (required)
+  - Integrated BLS (Bureau of Labor Statistics) OES salary data for 5 tech roles × 10 U.S. locations
+  - Calculates expected salary based on career stage and role alignment score
+  - Shows potential salary hike after skill improvements (15-75% increase depending on gaps)
+  - Generates histogram with market distribution, user's position, and target salary
+  - Displays market percentiles (10th, 25th, median, 75th, 90th) with proper data source citation
+- 2025-10-31: **📅 Enhanced 1-Year Improvement Plan** - More detailed, customized roadmap:
+  - Removed generic Q1/Q2/Q3/Q4 format
+  - Added timeline-based approach: Immediate (0-1 month), Short-term (1-6 months), Long-term (6-12 months)
+  - Role-specific project recommendations (e.g., Kaggle competitions for Data Scientists, microservices for Full Stack)
+  - Detailed learning paths for each skill gap (specific courses, certifications, project counts)
+  - Career-stage specific networking strategies (entry-level: 50-100 applications, senior: 15-20 strategic)
+  - 3-5x more detailed and actionable than previous version
+- 2025-10-31: **🎨 UI Cleanup** - Removed duplicate information displays:
+  - Removed duplicate category cards (Completeness, Summary, Education, Employment)
+  - Cleaner, more organized results page focusing on actionable insights
 - 2025-10-31: **🤖 AI-Powered Alignment Scoring** - Gemini AI now calculates resume-job match:
   - Uses `gemini-2.0-flash-exp` for semantic understanding of resume vs job description
   - Understands context: "led team of 5" = leadership, "statistical analysis" = "statistical modeling"
