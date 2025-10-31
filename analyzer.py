@@ -1,4 +1,5 @@
 import re
+import os
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from keywords import (
@@ -12,6 +13,12 @@ from parser import (
     extract_date_ranges, calculate_years_experience, get_text_window
 )
 from job_descriptions import get_job_description
+
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
 
 
 class ResumeAnalyzer:
@@ -35,6 +42,17 @@ class ResumeAnalyzer:
         self.metrics = extract_metrics(resume_text, METRIC_PATTERNS)
         
         self.resume_truths = self._extract_resume_truths()
+        
+        # Setup Gemini for AI-enhanced alignment scoring
+        self.api_key = os.environ.get('GOOGLE_API_KEY')
+        self.gemini_available = GEMINI_AVAILABLE and self.api_key
+        
+        if self.gemini_available:
+            try:
+                genai.configure(api_key=self.api_key)
+                self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            except Exception:
+                self.gemini_available = False
     
     def _extract_resume_truths(self) -> Dict[str, List[str]]:
         truths = {
@@ -576,6 +594,62 @@ class ResumeAnalyzer:
         
         return requirements
     
+    def _calculate_gemini_alignment(self, resume_text: str, job_description: str) -> Optional[Dict]:
+        """Use Gemini AI to calculate alignment score with contextual understanding."""
+        if not self.gemini_available:
+            return None
+        
+        try:
+            prompt = f"""You are an expert resume evaluator. Analyze how well the following resume matches the job description.
+
+IMPORTANT: Return ONLY a JSON object with this exact structure (no markdown, no explanation):
+{{
+  "score": <number 0-100>,
+  "matched_strengths": ["strength1", "strength2", "strength3"],
+  "key_gaps": ["gap1", "gap2", "gap3"]
+}}
+
+Job Description:
+{job_description[:3000]}
+
+Resume:
+{resume_text[:3000]}
+
+Scoring Guidelines:
+- 80-100: Excellent match (most requirements met, strong relevant experience)
+- 60-79: Good fit (many requirements met, some gaps)
+- 40-59: Moderate alignment (basic qualifications, significant gaps)
+- 0-39: Poor fit (major gaps in key requirements)
+
+Consider semantic similarity (e.g., "statistical analysis" = "statistical modeling").
+Focus on technical skills, experience level, and domain expertise.
+"""
+            
+            response = self.model.generate_content(prompt)
+            result_text = response.text.strip()
+            
+            # Remove markdown code blocks if present
+            if result_text.startswith('```'):
+                result_text = result_text.split('```')[1]
+                if result_text.startswith('json'):
+                    result_text = result_text[4:]
+                result_text = result_text.strip()
+            
+            # Parse JSON response
+            import json
+            result = json.loads(result_text)
+            
+            return {
+                'score': min(100, max(0, int(result.get('score', 0)))),
+                'matched_skills': result.get('matched_strengths', [])[:5],
+                'gaps': result.get('key_gaps', [])[:8],
+                'method': 'gemini_ai'
+            }
+            
+        except Exception as e:
+            print(f"Gemini alignment calculation failed: {e}")
+            return None
+    
     def calculate_role_alignment(self) -> Dict:
         if not self.target_role:
             return {
@@ -595,6 +669,34 @@ class ResumeAnalyzer:
             job_description = get_job_description(self.target_role)
             role_display = self.target_role
         
+        # Try Gemini AI-based alignment first (more accurate, context-aware)
+        if self.gemini_available:
+            gemini_result = self._calculate_gemini_alignment(self.original_text, job_description)
+            if gemini_result:
+                level = self.detect_career_stage()
+                score = gemini_result['score']
+                
+                # Create detailed alignment message
+                if score >= 80:
+                    alignment_msg = f"🤖 AI Analysis: Excellent match! Resume strongly aligns with {role_display} ({score}% match)"
+                elif score >= 60:
+                    alignment_msg = f"🤖 AI Analysis: Good fit with room to improve for {role_display} ({score}% match)"
+                elif score >= 40:
+                    alignment_msg = f"🤖 AI Analysis: Moderate alignment with {role_display} ({score}% match)"
+                else:
+                    alignment_msg = f"🤖 AI Analysis: Low alignment with {role_display} ({score}% match). Consider building more relevant experience."
+                
+                return {
+                    'score': score,
+                    'level': level,
+                    'alignment_details': alignment_msg,
+                    'gaps': gemini_result['gaps'],
+                    'matched_skills': gemini_result['matched_skills'],
+                    'total_required': len(gemini_result['gaps']) + len(gemini_result['matched_skills']),
+                    'method': 'gemini_ai'
+                }
+        
+        # Fallback to rule-based alignment (keyword matching)
         # Extract requirements from the job description
         required_skills = self._extract_requirements_from_jd(job_description)
         
@@ -666,13 +768,13 @@ class ResumeAnalyzer:
         
         # Create detailed alignment message
         if alignment_score >= 80:
-            alignment_msg = f"Excellent match! Resume covers {len(matched_skills)}/{len(required_skills)} key requirements for {role_display}"
+            alignment_msg = f"📊 Keyword Analysis: Excellent match! Resume covers {len(matched_skills)}/{len(required_skills)} key requirements for {role_display}"
         elif alignment_score >= 60:
-            alignment_msg = f"Good fit with room to improve. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
+            alignment_msg = f"📊 Keyword Analysis: Good fit with room to improve. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
         elif alignment_score >= 40:
-            alignment_msg = f"Moderate alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
+            alignment_msg = f"📊 Keyword Analysis: Moderate alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
         else:
-            alignment_msg = f"Low alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}. Consider building more relevant experience."
+            alignment_msg = f"📊 Keyword Analysis: Low alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}. Consider building more relevant experience."
         
         return {
             'score': alignment_score,
@@ -680,7 +782,8 @@ class ResumeAnalyzer:
             'alignment_details': alignment_msg,
             'gaps': gaps,
             'matched_skills': matched_skills[:5],  # Show top 5 matches
-            'total_required': len(required_skills)
+            'total_required': len(required_skills),
+            'method': 'keyword_matching'
         }
     
     def generate_tailored_keywords(self, gemini_keywords: Optional[List[str]] = None) -> List[str]:
