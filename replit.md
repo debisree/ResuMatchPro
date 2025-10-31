@@ -1,7 +1,7 @@
-# Resume Guru
+# ResuMatch
 
 ## Overview
-A comprehensive web application that analyzes resume quality and provides actionable insights to help users craft the perfect resume for their target roles. Built with FastAPI backend and HTMX + Tailwind frontend.
+A comprehensive web application that analyzes resume quality and provides actionable insights to help users match their resumes to their target roles. Built with FastAPI backend and HTMX + Tailwind frontend.
 
 ## Features
 - **Session-based Authentication**: Username login or guest access with session cookies
