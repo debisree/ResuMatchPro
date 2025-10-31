@@ -56,6 +56,16 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-10-31: **🎯 Career Goal Planning System** - Personalized roadmap based on career aspirations:
+  - Added Career Goals panel with required fields: goal type (Promotion/Pivot), target location, timeframe (6 months/1 year)
+  - Changed location to fixed dropdown with 10 options (NYC/NJ, SFO, LA, San Diego, Boston, DC, Raleigh/Durham, Houston, Dallas, Austin)
+  - Added domain field for industry specialization (e.g., "Data Science in Fintech")
+  - Enhanced improvement plan with targeted suggestions based on:
+    - **Promotion vs Pivot**: Different advice for climbing ladder vs changing careers
+    - **Relocation**: Location-specific networking and job market research if moving cities
+    - **Domain Change**: Industry-specific projects and certifications when switching domains
+    - **Timeframe**: Accelerated advice for 6-month timeline vs standard 12-month pacing
+  - Improvement plan now includes context flags: is_relocation, is_domain_change, goal_type
 - 2025-10-31: **💰 Salary Analysis & Market Insights** - Location-based salary analysis with visualization:
   - Added location field to upload form (required)
   - Integrated BLS (Bureau of Labor Statistics) OES salary data for 5 tech roles × 10 U.S. locations
