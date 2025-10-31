@@ -56,9 +56,14 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
-- 2025-10-31: **Role Alignment Upgrade** - Now uses real job descriptions for 10 predefined tech roles:
-  - Added job_descriptions.py with comprehensive JDs for Data Science, MLE, AI Engineer, Full Stack, Software Engineer, Backend, Frontend, DevOps, Cloud Architect, Technology Manager, Data Analyst
-  - Updated home.html to use dropdown select (instead of text input) for target role
+- 2025-10-31: **Custom Job Description Support** - Now accepts pasted job descriptions OR predefined roles:
+  - Added radio toggle: "Quick Start (Predefined Roles)" vs "Paste Real Job Description"
+  - Users can paste actual job postings for accurate alignment to real requirements
+  - Explicit flag-based detection (not length heuristic) ensures all custom JDs work correctly
+  - Added semantic synonym matching: "statistical modeling" = "statistical analysis", "data visualization" = "data viz", "Power BI" = "BI tool", etc. (20+ synonym groups)
+  - Fixes issue where predefined JDs were too specific (e.g., asking for Tableau when user has Power BI or Python viz)
+- 2025-10-31: **Role Alignment Upgrade** - Uses real job descriptions for 12 predefined tech roles:
+  - Added job_descriptions.py with comprehensive JDs for Data Science, Senior Data Science, MLE, AI Engineer, Full Stack, Software Engineer, Backend, Frontend, DevOps, Cloud Architect, Technology Manager, Data Analyst
   - Enhanced requirement extraction with curated keyword library (200+ tech terms) + strict pattern matching
   - Uses camelCase/PascalCase extraction (TensorFlow, PyTorch) + ALLCAPS acronyms (AWS, GCP, ML, AI) with comprehensive blacklist filtering
   - Removed noisy extractors (parenthetical, hyphen-term) that captured legal/benefits boilerplate
