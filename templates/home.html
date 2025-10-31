@@ -19,15 +19,27 @@
             <label for="target_role" class="block text-sm font-medium text-gray-700 mb-2">
                 Target Role <span class="text-red-500">*</span>
             </label>
-            <input 
-                type="text" 
+            <select 
                 id="target_role" 
                 name="target_role" 
                 required
-                placeholder="e.g., Machine Learning Engineer in FinTech"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-            <p class="text-sm text-gray-500 mt-1">Describe your dream job role and industry</p>
+                <option value="">-- Select your target role --</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Senior Data Science">Senior Data Science</option>
+                <option value="MLE">MLE (Machine Learning Engineer)</option>
+                <option value="AI Engineer">AI Engineer</option>
+                <option value="Full Stack Web Developer">Full Stack Web Developer</option>
+                <option value="Software Engineer">Software Engineer</option>
+                <option value="Backend Developer">Backend Developer</option>
+                <option value="Frontend Developer">Frontend Developer</option>
+                <option value="DevOps Engineer">DevOps Engineer</option>
+                <option value="Cloud Architect">Cloud Architect</option>
+                <option value="Technology Manager">Technology Manager</option>
+                <option value="Data Analyst">Data Analyst</option>
+            </select>
+            <p class="text-sm text-gray-500 mt-1">Select the role you're targeting for personalized feedback</p>
         </div>
         
         <div>
