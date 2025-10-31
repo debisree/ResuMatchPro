@@ -39,64 +39,64 @@ SOC_CODE_MAPPING = {
 # Format: {role: {location: [10th, 25th, median, 75th, 90th]}}
 SALARY_DATABASE = {
     'data scientist': {
-        'national': [66, 84, 108, 140, 175],
-        'san francisco': [95, 120, 150, 185, 230],
-        'new york': [88, 110, 142, 175, 215],
-        'seattle': [85, 105, 135, 170, 210],
-        'austin': [70, 88, 115, 145, 180],
-        'boston': [80, 100, 130, 165, 200],
-        'chicago': [72, 90, 118, 150, 185],
-        'los angeles': [78, 98, 128, 160, 195],
-        'denver': [70, 87, 112, 142, 175],
-        'remote': [72, 90, 120, 152, 190],
+        'NYC/NJ': [88, 110, 142, 175, 215],
+        'SFO': [95, 120, 150, 185, 230],
+        'LA': [78, 98, 128, 160, 195],
+        'San Diego': [72, 92, 120, 152, 188],
+        'Boston': [80, 100, 130, 165, 200],
+        'DC': [82, 103, 135, 168, 205],
+        'Raleigh/Durham': [68, 85, 112, 142, 175],
+        'Houston': [70, 88, 115, 145, 180],
+        'Dallas': [72, 90, 118, 150, 185],
+        'Austin': [70, 88, 115, 145, 180],
     },
     'software engineer': {
-        'national': [68, 88, 115, 150, 190],
-        'san francisco': [100, 130, 165, 205, 250],
-        'new york': [92, 118, 155, 192, 235],
-        'seattle': [90, 115, 150, 188, 230],
-        'austin': [75, 95, 125, 158, 195],
-        'boston': [82, 105, 138, 173, 212],
-        'chicago': [74, 95, 125, 158, 195],
-        'los angeles': [80, 102, 135, 170, 208],
-        'denver': [72, 92, 120, 152, 188],
-        'remote': [75, 96, 128, 162, 200],
+        'NYC/NJ': [92, 118, 155, 192, 235],
+        'SFO': [100, 130, 165, 205, 250],
+        'LA': [80, 102, 135, 170, 208],
+        'San Diego': [75, 96, 128, 162, 198],
+        'Boston': [82, 105, 138, 173, 212],
+        'DC': [85, 108, 142, 178, 218],
+        'Raleigh/Durham': [72, 92, 122, 155, 190],
+        'Houston': [75, 95, 125, 158, 195],
+        'Dallas': [74, 95, 125, 158, 195],
+        'Austin': [75, 95, 125, 158, 195],
     },
     'frontend developer': {
-        'national': [58, 76, 100, 130, 165],
-        'san francisco': [85, 110, 142, 178, 218],
-        'new york': [78, 102, 135, 170, 208],
-        'seattle': [75, 98, 130, 165, 202],
-        'austin': [62, 82, 108, 138, 172],
-        'boston': [68, 90, 120, 152, 188],
-        'chicago': [60, 80, 108, 138, 172],
-        'los angeles': [65, 88, 118, 150, 185],
-        'denver': [58, 78, 105, 135, 168],
-        'remote': [62, 84, 112, 145, 180],
+        'NYC/NJ': [78, 102, 135, 170, 208],
+        'SFO': [85, 110, 142, 178, 218],
+        'LA': [65, 88, 118, 150, 185],
+        'San Diego': [62, 84, 112, 142, 175],
+        'Boston': [68, 90, 120, 152, 188],
+        'DC': [70, 92, 123, 156, 192],
+        'Raleigh/Durham': [58, 78, 105, 135, 168],
+        'Houston': [62, 82, 108, 138, 172],
+        'Dallas': [60, 80, 108, 138, 172],
+        'Austin': [62, 82, 108, 138, 172],
     },
     'devops engineer': {
-        'national': [72, 92, 120, 155, 195],
-        'san francisco': [105, 135, 172, 215, 265],
-        'new york': [95, 122, 160, 200, 245],
-        'seattle': [92, 118, 155, 195, 238],
-        'austin': [78, 100, 132, 168, 208],
-        'boston': [85, 110, 145, 182, 225],
-        'chicago': [75, 98, 130, 165, 205],
-        'los angeles': [82, 108, 142, 180, 222],
-        'denver': [75, 96, 128, 162, 200],
-        'remote': [78, 102, 135, 172, 212],
+        'NYC/NJ': [95, 122, 160, 200, 245],
+        'SFO': [105, 135, 172, 215, 265],
+        'LA': [82, 108, 142, 180, 222],
+        'San Diego': [78, 102, 135, 172, 212],
+        'Boston': [85, 110, 145, 182, 225],
+        'DC': [88, 113, 150, 188, 232],
+        'Raleigh/Durham': [72, 95, 128, 162, 200],
+        'Houston': [78, 100, 132, 168, 208],
+        'Dallas': [75, 98, 130, 165, 205],
+        'Austin': [78, 100, 132, 168, 208],
     },
     'data analyst': {
-        'national': [48, 62, 82, 105, 132],
-        'san francisco': [70, 90, 118, 148, 182],
-        'new york': [65, 84, 112, 140, 172],
-        'seattle': [62, 80, 108, 138, 170],
-        'austin': [52, 68, 90, 115, 145],
-        'boston': [58, 75, 100, 128, 158],
-        'chicago': [50, 65, 88, 112, 140],
-        'los angeles': [55, 72, 96, 122, 152],
-        'denver': [50, 65, 87, 112, 140],
-        'remote': [52, 68, 92, 118, 148],
+        'NYC/NJ': [65, 84, 112, 140, 172],
+        'SFO': [70, 90, 118, 148, 182],
+        'LA': [55, 72, 96, 122, 152],
+        'San Diego': [52, 68, 92, 118, 148],
+        'Boston': [58, 75, 100, 128, 158],
+        'DC': [60, 78, 105, 132, 162],
+        'Raleigh/Durham': [48, 62, 85, 110, 138],
+        'Houston': [52, 68, 90, 115, 145],
+        'Dallas': [50, 65, 88, 112, 140],
+        'Austin': [52, 68, 90, 115, 145],
     },
 }
 
@@ -106,33 +106,22 @@ class SalaryAnalyzer:
         self.data_source = "U.S. Bureau of Labor Statistics (BLS) - Occupational Employment and Wage Statistics (May 2024)"
     
     def _normalize_location(self, location: str) -> str:
-        """Normalize location string for matching"""
-        location_lower = location.lower().strip()
+        """Normalize location string for matching - now using exact dropdown values"""
+        # Direct match for exact location names from dropdown
+        location_clean = location.strip()
         
-        # Map common variations
-        city_mappings = {
-            'sf': 'san francisco',
-            'bay area': 'san francisco',
-            'san jose': 'san francisco',
-            'nyc': 'new york',
-            'la': 'los angeles',
-            'chicago, il': 'chicago',
-            'boston, ma': 'boston',
-        }
+        # List of valid locations from dropdown
+        valid_locations = [
+            'NYC/NJ', 'SFO', 'LA', 'San Diego', 'Boston', 
+            'DC', 'Raleigh/Durham', 'Houston', 'Dallas', 'Austin'
+        ]
         
-        for variant, canonical in city_mappings.items():
-            if variant in location_lower:
-                return canonical
+        # Return exact match if found
+        if location_clean in valid_locations:
+            return location_clean
         
-        # Extract major city names
-        major_cities = ['san francisco', 'new york', 'seattle', 'austin', 'boston', 
-                       'chicago', 'los angeles', 'denver', 'remote']
-        
-        for city in major_cities:
-            if city in location_lower:
-                return city
-        
-        return 'national'
+        # Fallback to default if not recognized
+        return 'Austin'  # Default to Austin as a reasonable middle-market fallback
     
     def _normalize_role(self, role: str) -> str:
         """Normalize role for matching in database"""

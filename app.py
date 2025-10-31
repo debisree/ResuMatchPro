@@ -129,7 +129,12 @@ async def analyze_resume(
     custom_jd: Optional[str] = Form(None),
     jd_mode: Optional[str] = Form("predefined"),
     seniority_goal: Optional[str] = Form(None),
-    location: Optional[str] = Form(None)
+    location: Optional[str] = Form(None),
+    domain: Optional[str] = Form(None),
+    career_goal: Optional[str] = Form(None),
+    target_location: Optional[str] = Form(None),
+    target_domain: Optional[str] = Form(None),
+    timeframe: Optional[str] = Form(None)
 ):
     session_id = get_session_id(request)
     
@@ -140,6 +145,14 @@ async def analyze_resume(
     # Validate location
     if not location or not location.strip():
         raise HTTPException(status_code=400, detail="Location is required for salary analysis")
+    
+    # Validate career goals
+    if not career_goal or not career_goal.strip():
+        raise HTTPException(status_code=400, detail="Career goal is required")
+    if not target_location or not target_location.strip():
+        raise HTTPException(status_code=400, detail="Target location is required")
+    if not timeframe or not timeframe.strip():
+        raise HTTPException(status_code=400, detail="Timeframe is required")
     
     # Determine if using custom JD based on explicit mode
     is_custom_jd = bool(jd_mode == "custom" and custom_jd and custom_jd.strip())
@@ -173,7 +186,13 @@ async def analyze_resume(
         plan = plan_gen.generate_plan(
             analysis_result,
             role_input,
-            analysis_result['career_stage']
+            analysis_result['career_stage'],
+            current_location=location.strip(),
+            current_domain=domain.strip() if domain else None,
+            career_goal=career_goal.strip(),
+            target_location=target_location.strip(),
+            target_domain=target_domain.strip() if target_domain else None,
+            timeframe=int(timeframe.strip())
         )
         analysis_result['improvement_plan'] = plan
         

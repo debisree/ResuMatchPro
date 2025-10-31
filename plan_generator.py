@@ -21,12 +21,31 @@ class ImprovementPlanGenerator:
             except Exception:
                 self.gemini_available = False
     
-    def generate_plan(self, analysis_result: Dict, target_role: str, career_stage: str) -> Dict:
-        plan = self._generate_rule_based_plan(analysis_result, target_role, career_stage)
+    def generate_plan(
+        self, 
+        analysis_result: Dict, 
+        target_role: str, 
+        career_stage: str,
+        current_location: str = "",
+        current_domain: Optional[str] = None,
+        career_goal: str = "promotion",
+        target_location: str = "",
+        target_domain: Optional[str] = None,
+        timeframe: int = 12
+    ) -> Dict:
+        plan = self._generate_rule_based_plan(
+            analysis_result, target_role, career_stage,
+            current_location, current_domain, career_goal,
+            target_location, target_domain, timeframe
+        )
         
         if self.gemini_available:
             try:
-                enhanced_plan = self._enhance_with_gemini(plan, analysis_result, target_role, career_stage)
+                enhanced_plan = self._enhance_with_gemini(
+                    plan, analysis_result, target_role, career_stage,
+                    current_location, current_domain, career_goal,
+                    target_location, target_domain, timeframe
+                )
                 return enhanced_plan
             except Exception as e:
                 print(f"Gemini enhancement failed: {e}")
@@ -34,7 +53,18 @@ class ImprovementPlanGenerator:
         
         return plan
     
-    def _generate_rule_based_plan(self, analysis: Dict, target_role: str, career_stage: str) -> Dict:
+    def _generate_rule_based_plan(
+        self, 
+        analysis: Dict, 
+        target_role: str, 
+        career_stage: str,
+        current_location: str = "",
+        current_domain: Optional[str] = None,
+        career_goal: str = "promotion",
+        target_location: str = "",
+        target_domain: Optional[str] = None,
+        timeframe: int = 12
+    ) -> Dict:
         plan = {
             'skills_to_acquire': [],
             'projects_to_build': [],
@@ -42,7 +72,17 @@ class ImprovementPlanGenerator:
             'networking_applications': [],
             'immediate_actions': [],
             'short_term': [],
-            'long_term': []
+            'long_term': [],
+            'career_goal_context': {
+                'goal_type': career_goal,
+                'current_location': current_location,
+                'target_location': target_location,
+                'current_domain': current_domain,
+                'target_domain': target_domain,
+                'timeframe_months': timeframe,
+                'is_relocation': current_location != target_location,
+                'is_domain_change': current_domain != target_domain
+            }
         }
         
         gaps = analysis.get('role_alignment', {}).get('gaps', [])
@@ -75,7 +115,8 @@ class ImprovementPlanGenerator:
         
         # Timeline recommendations (point-wise instead of quarterly)
         timeline = self._generate_timeline_recommendations(
-            career_stage, alignment_score, gaps
+            career_stage, alignment_score, gaps, career_goal, 
+            current_location, target_location, current_domain, target_domain, timeframe
         )
         plan['immediate_actions'] = timeline['immediate']
         plan['short_term'] = timeline['short_term']
@@ -201,39 +242,94 @@ class ImprovementPlanGenerator:
         
         return strategy[:10]
     
-    def _generate_timeline_recommendations(self, career_stage: str, alignment_score: int, gaps: List[str]) -> Dict:
+    def _generate_timeline_recommendations(
+        self, 
+        career_stage: str, 
+        alignment_score: int, 
+        gaps: List[str],
+        career_goal: str = "promotion",
+        current_location: str = "",
+        target_location: str = "",
+        current_domain: Optional[str] = None,
+        target_domain: Optional[str] = None,
+        timeframe: int = 12
+    ) -> Dict:
         timeline = {
             'immediate': [],  # 0-1 month
-            'short_term': [],  # 1-6 months
-            'long_term': []  # 6-12 months
+            'short_term': [],  # 1-6 months (or adjust based on timeframe)
+            'long_term': []  # 6-12 months (or adjust based on timeframe)
         }
         
-        # Immediate actions (0-1 month)
+        is_relocation = current_location != target_location
+        is_domain_change = current_domain != target_domain if current_domain and target_domain else False
+        is_pivot = career_goal == "pivot"
+        
+        # Immediate actions (0-1 month) - Career goal specific
         timeline['immediate'].append("Update resume with quantified achievements and ATS-friendly formatting. Get it reviewed by 2-3 professionals")
-        timeline['immediate'].append("Optimize LinkedIn profile with professional photo, compelling headline, and detailed experience section")
+        
+        if is_pivot:
+            timeline['immediate'].append(f"Research {target_domain or 'target domain'} industry: read 5-10 industry reports, follow key influencers, join domain-specific communities")
+            timeline['immediate'].append("Reframe existing experience to highlight transferable skills relevant to new career path")
+        else:
+            timeline['immediate'].append("Optimize LinkedIn profile showcasing readiness for promotion to next level with leadership achievements")
+        
         timeline['immediate'].append("Identify top 3-5 skill gaps and enroll in relevant online courses (Coursera, Udemy, edX)")
         
         if alignment_score < 50:
             timeline['immediate'].append("Start first portfolio project addressing biggest skill gap - dedicate 10-15 hours/week")
         
-        timeline['immediate'].append("Join 2-3 professional communities (Reddit, Discord, LinkedIn groups) and start engaging with content")
+        if is_relocation:
+            timeline['immediate'].append(f"Join {target_location}-specific professional groups (LinkedIn, Meetup) and start building local network")
         
-        # Short-term actions (1-6 months)
-        timeline['short_term'].append("Complete 2-3 significant portfolio projects with detailed documentation, live demos, and GitHub repositories")
-        timeline['short_term'].append("Earn 1-2 relevant certifications (AWS, Google Cloud, specific technologies) to validate skills")
-        timeline['short_term'].append("Conduct 5-10 informational interviews and expand professional network by 50+ meaningful connections")
+        # Short-term actions (1-6 months or adjusted for timeframe)
+        if is_domain_change:
+            timeline['short_term'].append(f"Complete 2-3 domain-specific projects showcasing expertise in {target_domain or 'target industry'} - focus on industry-relevant problems")
+            timeline['short_term'].append(f"Earn domain-specific certification or complete specialized training program in {target_domain or 'target field'}")
+        else:
+            timeline['short_term'].append("Complete 2-3 significant portfolio projects with detailed documentation, live demos, and GitHub repositories")
+            timeline['short_term'].append("Earn 1-2 relevant certifications (AWS, Google Cloud, specific technologies) to validate skills")
+        
+        if is_relocation:
+            timeline['short_term'].append(f"Network actively in {target_location}: attend 4-6 local meetups/conferences, conduct informational interviews with professionals in target city")
+            timeline['short_term'].append(f"Research {target_location} job market: identify top employers, typical salary ranges, cost of living considerations")
+        else:
+            timeline['short_term'].append("Conduct 5-10 informational interviews and expand professional network by 50+ meaningful connections")
+        
         timeline['short_term'].append("Contribute to 2-3 open source projects - get at least 3 pull requests merged")
+        
+        if is_pivot:
+            timeline['short_term'].append("Build transitional narrative: create compelling story explaining career pivot, emphasizing transferable skills and genuine interest")
+            timeline['short_term'].append("Seek mentorship from 2-3 professionals who successfully made similar career transitions")
+        else:
+            timeline['short_term'].append("Demonstrate leadership: lead initiatives, mentor others, take on stretch assignments to showcase promotion readiness")
+        
         timeline['short_term'].append("Start applying to positions: tailor resume for each application, aim for 20-30 quality applications")
         timeline['short_term'].append("Practice technical interviews: solve 50+ coding problems, do 3-5 mock interviews")
         
         if career_stage in ["Student", "Recent Graduate"]:
             timeline['short_term'].append("Build strong foundation in core technologies through structured courses and hands-on practice (20+ hours/week)")
         
-        # Long-term actions (6-12 months)
+        # Long-term actions (6-12 months or adjusted for timeframe)
         timeline['long_term'].append("Achieve measurable expertise: portfolio with 5-6 production-quality projects, 2-3 certifications, strong GitHub presence")
-        timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
-        timeline['long_term'].append("Expand to 50-70 total applications with systematic follow-ups. Convert at least 10% to interviews")
+        
+        if is_pivot:
+            timeline['long_term'].append(f"Establish credibility in {target_domain or 'new field'}: publish 5-8 industry-specific articles/case studies, speak at domain conferences")
+            timeline['long_term'].append("Complete career transition: secure role in new field, leverage transferable skills while continuing to build domain expertise")
+        else:
+            timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
+            timeline['long_term'].append("Position for promotion: take ownership of high-impact projects, demonstrate strategic thinking and leadership capabilities")
+        
+        if is_relocation:
+            timeline['long_term'].append(f"Execute relocation to {target_location}: secure job offer, plan move logistics, establish connections before relocating")
+            if timeframe == 6:
+                timeline['long_term'].append("Accelerated timeline: Target 30-40 applications in target location, prioritize companies with relocation support")
+        else:
+            timeline['long_term'].append("Expand to 50-70 total applications with systematic follow-ups. Convert at least 10% to interviews")
+        
         timeline['long_term'].append("Secure multiple offers through strategic networking and strong technical interviews. Negotiate compensation package")
+        
+        if timeframe == 6:
+            timeline['long_term'].append("⏰ 6-month timeline: Intensify efforts - dedicate 15-20 hours/week to upskilling, networking, and applications")
         
         if alignment_score >= 70:
             timeline['long_term'].append("Focus on interview preparation and applications - you're already well-qualified, now it's about landing the right opportunity")
@@ -242,7 +338,19 @@ class ImprovementPlanGenerator:
         
         return timeline
     
-    def _enhance_with_gemini(self, base_plan: Dict, analysis: Dict, target_role: str, career_stage: str) -> Dict:
+    def _enhance_with_gemini(
+        self, 
+        base_plan: Dict, 
+        analysis: Dict, 
+        target_role: str, 
+        career_stage: str,
+        current_location: str = "",
+        current_domain: Optional[str] = None,
+        career_goal: str = "promotion",
+        target_location: str = "",
+        target_domain: Optional[str] = None,
+        timeframe: int = 12
+    ) -> Dict:
         job_description = get_job_description(target_role)
         
         prompt = f"""You are a career advisor helping someone transition to a {target_role} role. 
