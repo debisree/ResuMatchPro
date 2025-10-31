@@ -15,7 +15,7 @@ from plan_generator import ImprovementPlanGenerator
 from database import Database
 from report_generator import ReportGenerator
 
-app = FastAPI(title="Resume Quality Analyzer")
+app = FastAPI(title="ResuMatch")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
