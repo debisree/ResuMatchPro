@@ -11,6 +11,7 @@ from parser import (
     extract_emails, extract_phones, extract_urls, extract_years,
     extract_date_ranges, calculate_years_experience, get_text_window
 )
+from job_descriptions import get_job_description
 
 
 class ResumeAnalyzer:
@@ -446,6 +447,132 @@ class ResumeAnalyzer:
             'recommendations': recommendations if recommendations else ["Resume is ATS-ready"]
         }
     
+    def _extract_requirements_from_jd(self, job_description: str) -> List[str]:
+        """Extract key requirements/keywords from job description using curated keyword matching."""
+        requirements = []
+        jd_lower = job_description.lower()
+        
+        # Extract technical terms: camelCase or PascalCase (e.g., TensorFlow, PyTorch, MLflow)
+        camel_pattern = r'\b([A-Z][a-z]+[A-Z][a-zA-Z]*)\b'
+        for match in re.finditer(camel_pattern, job_description):
+            requirements.append(match.group(1).lower())
+        
+        # Match ALLCAPS technical acronyms (e.g., AWS, GCP, ML, AI, CI/CD)
+        acronym_pattern = r'\b([A-Z]{2,}(?:/[A-Z]{2,})*)\b'
+        
+        # Blacklist: common non-technical ALLCAPS words
+        acronym_blacklist = {
+            'EEO', 'AA', 'ADA', 'EEOC', 'OFCCP', 'FMLA', 'FLSA', 'EOE',
+            'US', 'USA', 'UK', 'EU', 'CA', 'NY', 'SF', 'TX', 'FL', 'IL', 'WA',
+            'OR', 'AND', 'THE', 'FOR', 'WITH', 'FROM', 'INTO', 'THIS', 'THAT',
+            'ARE', 'WE', 'OUR', 'YOU', 'YOUR', 'ALL', 'ANY', 'NOT', 'BUT', 'AN',
+            'BS', 'BA', 'MS', 'MA', 'MBA', 'PHD', 'MD', 'JD',
+            'CEO', 'CTO', 'CFO', 'VP', 'SVP', 'EVP', 'HR', 'PM', 'QA', 'BI',
+            'REQUIREMENTS', 'RESPONSIBILITIES', 'EXPERIENCE', 'KNOWLEDGE', 
+            'SKILLS', 'EDUCATION', 'QUALIFICATIONS'
+        }
+        
+        for match in re.finditer(acronym_pattern, job_description):
+            term = match.group(1)
+            # Split on slash and check each part against blacklist
+            parts = term.split('/')
+            all_parts_clean = all(part not in acronym_blacklist for part in parts)
+            if all_parts_clean and term not in acronym_blacklist:
+                requirements.append(term.lower())
+        
+        # Comprehensive keyword lists (expanded from original)
+        tech_keywords = {
+            # Programming languages
+            'python', 'java', 'javascript', 'typescript', 'c++', 'go', 'rust', 'ruby', 
+            'php', 'swift', 'kotlin', 'scala', 'r', 'sql', 'bash', 'shell', 'c#', 'perl',
+            
+            # AI/ML specific
+            'llm', 'llms', 'large language model', 'prompt engineering', 'fine-tuning',
+            'rag', 'retrieval augmented generation', 'embedding', 'embeddings', 
+            'vector database', 'pinecone', 'weaviate', 'chroma', 'faiss',
+            'transformer', 'attention mechanism', 'gpt', 'bert', 'openai', 'anthropic',
+            'ai safety', 'ai alignment', 'model evaluation', 'hallucination',
+            
+            # ML/Data Science
+            'machine learning', 'deep learning', 'neural network', 'cnn', 'rnn', 'lstm',
+            'tensorflow', 'pytorch', 'keras', 'scikit-learn', 'pandas', 'numpy',
+            'feature engineering', 'model deployment', 'mlops', 'mlflow', 'kubeflow',
+            'data science', 'statistical modeling', 'statistics', 'linear algebra',
+            'optimization', 'gradient descent', 'backpropagation',
+            
+            # Web frameworks
+            'react', 'vue', 'angular', 'svelte', 'next.js', 'nuxt', 'gatsby',
+            'node.js', 'express', 'fastapi', 'flask', 'django', 'spring', 'laravel',
+            
+            # Cloud platforms
+            'aws', 'azure', 'gcp', 'google cloud', 'cloud platform', 'lambda',
+            'ec2', 's3', 'dynamodb', 'cloudformation', 'serverless', 'cloud functions',
+            'cloud run', 'app engine', 'elastic beanstalk',
+            
+            # DevOps/Infrastructure
+            'docker', 'kubernetes', 'k8s', 'jenkins', 'gitlab ci', 'github actions',
+            'circleci', 'terraform', 'pulumi', 'ansible', 'chef', 'puppet',
+            'infrastructure as code', 'iac', 'containerization', 'orchestration',
+            
+            # Databases
+            'postgresql', 'postgres', 'mysql', 'mongodb', 'redis', 'elasticsearch',
+            'dynamodb', 'cassandra', 'nosql', 'relational', 'database design',
+            
+            # Monitoring/Observability
+            'prometheus', 'grafana', 'datadog', 'new relic', 'splunk', 'elk',
+            'monitoring', 'logging', 'observability', 'alerting',
+            
+            # Architecture/Design
+            'microservices', 'api', 'rest', 'restful', 'graphql', 'grpc',
+            'event-driven', 'message queue', 'kafka', 'rabbitmq', 'pub/sub',
+            'scalability', 'high availability', 'load balancing', 'caching',
+            
+            # Security
+            'security', 'authentication', 'authorization', 'oauth', 'jwt', 'saml',
+            'encryption', 'compliance', 'gdpr', 'hipaa', 'soc2',
+            
+            # Testing
+            'testing', 'unit test', 'integration test', 'e2e', 'tdd', 'test-driven',
+            'jest', 'pytest', 'cypress', 'selenium', 'playwright',
+            
+            # Methodologies
+            'agile', 'scrum', 'kanban', 'ci/cd', 'continuous integration',
+            'continuous deployment', 'devops', 'gitops',
+            
+            # Leadership/Management
+            'leadership', 'mentoring', 'coaching', 'project management',
+            'stakeholder management', 'team lead', 'technical lead',
+            'people management', 'performance review', 'hiring', 'onboarding',
+            
+            # Data/Analytics
+            'analytics', 'data visualization', 'tableau', 'power bi', 'looker',
+            'data warehouse', 'etl', 'data pipeline', 'spark', 'hadoop', 'airflow',
+            'a/b testing', 'experimentation', 'business intelligence',
+            
+            # Frontend specific
+            'html', 'css', 'sass', 'responsive design', 'accessibility', 'wcag',
+            'seo', 'web performance', 'core web vitals', 'state management',
+            'redux', 'mobx', 'zustand', 'recoil',
+            
+            # Version control
+            'git', 'github', 'gitlab', 'bitbucket', 'version control', 'code review'
+        }
+        
+        # Check JD for all keywords
+        for keyword in tech_keywords:
+            if keyword in jd_lower:
+                requirements.append(keyword)
+        
+        # Extract numbers + years for experience requirements
+        exp_pattern = r'(\d+)\+?\s*years?'
+        if re.search(exp_pattern, jd_lower):
+            requirements.append('experience')
+        
+        # Remove duplicates and filter out very short terms
+        requirements = list(set(req for req in requirements if len(req) > 1))
+        
+        return requirements
+    
     def calculate_role_alignment(self) -> Dict:
         if not self.target_role:
             return {
@@ -455,35 +582,50 @@ class ResumeAnalyzer:
                 'gaps': []
             }
         
-        target_vocab = []
-        for role_key, vocab in ROLE_VOCABULARIES.items():
-            if role_key in self.target_role:
-                target_vocab = vocab
-                break
+        # Get the actual job description for this role
+        job_description = get_job_description(self.target_role)
         
-        if not target_vocab:
-            role_tokens = self.target_role.split()
-            for token in role_tokens:
-                if token in TOOL_HINTS:
-                    target_vocab.append(token)
-                if token in DOMAIN_HINTS:
-                    target_vocab.append(token)
+        # Extract requirements from the job description
+        required_skills = self._extract_requirements_from_jd(job_description)
         
-        if not target_vocab:
-            target_vocab = TOOL_HINTS[:20]
+        if not required_skills:
+            # Fallback to old method if no requirements extracted
+            return {
+                'score': 0,
+                'level': self.detect_career_stage(),
+                'alignment_details': f'Could not extract requirements for {self.target_role}',
+                'gaps': []
+            }
         
-        matches = sum(1 for term in target_vocab if term in self.text)
-        alignment_score = int((matches / max(len(target_vocab), 1)) * 100)
+        # Check which requirements are present in resume
+        matched_skills = [skill for skill in required_skills if skill in self.text]
+        missing_skills = [skill for skill in required_skills if skill not in self.text]
         
-        gaps = [term for term in target_vocab[:10] if term not in self.text][:5]
+        # Calculate alignment score
+        alignment_score = int((len(matched_skills) / len(required_skills)) * 100)
+        
+        # Get top 8 gaps for feedback
+        gaps = missing_skills[:8]
         
         level = self.detect_career_stage()
+        
+        # Create detailed alignment message
+        if alignment_score >= 80:
+            alignment_msg = f"Excellent match! Resume covers {len(matched_skills)}/{len(required_skills)} key requirements for {self.target_role}"
+        elif alignment_score >= 60:
+            alignment_msg = f"Good fit with room to improve. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}"
+        elif alignment_score >= 40:
+            alignment_msg = f"Moderate alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}"
+        else:
+            alignment_msg = f"Low alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}. Consider building more relevant experience."
         
         return {
             'score': alignment_score,
             'level': level,
-            'alignment_details': f"Matches {matches}/{len(target_vocab)} key terms for {self.target_role}",
-            'gaps': gaps
+            'alignment_details': alignment_msg,
+            'gaps': gaps,
+            'matched_skills': matched_skills[:5],  # Show top 5 matches
+            'total_required': len(required_skills)
         }
     
     def generate_tailored_keywords(self, gemini_keywords: Optional[List[str]] = None) -> List[str]:
