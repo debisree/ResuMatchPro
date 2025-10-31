@@ -40,80 +40,207 @@ class ImprovementPlanGenerator:
             'projects_to_build': [],
             'portfolio_signals': [],
             'networking_applications': [],
-            'quarterly_milestones': {
-                'Q1': [],
-                'Q2': [],
-                'Q3': [],
-                'Q4': []
-            }
+            'immediate_actions': [],
+            'short_term': [],
+            'long_term': []
         }
         
         gaps = analysis.get('role_alignment', {}).get('gaps', [])
         completeness_issues = analysis.get('completeness', {}).get('details', [])
         summary_issues = analysis.get('summary', {}).get('details', [])
+        alignment_score = analysis.get('role_alignment', {}).get('score', 0)
         
-        for gap in gaps[:5]:
-            plan['skills_to_acquire'].append(f"Learn {gap.title()}")
+        # Detailed skills acquisition with learning path
+        for gap in gaps[:8]:
+            skill_detail = self._get_skill_learning_path(gap, target_role, career_stage)
+            plan['skills_to_acquire'].append(skill_detail)
         
-        if career_stage in ["Student", "Recent Graduate"]:
-            plan['projects_to_build'].extend([
-                "Build 2-3 end-to-end projects demonstrating skills in " + target_role,
-                "Contribute to 1-2 open source projects in relevant domain",
-                "Complete online certifications or courses in key technologies"
-            ])
-        elif career_stage == "Mid-Level":
-            plan['projects_to_build'].extend([
-                "Lead a complex technical project with measurable impact",
-                "Publish technical blog posts or speak at meetups",
-                "Mentor junior team members or contribute to knowledge sharing"
-            ])
-        else:
-            plan['projects_to_build'].extend([
-                "Drive strategic initiatives with cross-functional impact",
-                "Contribute to open source or industry standards",
-                "Build thought leadership through publications and speaking"
-            ])
+        # Customized project recommendations based on role and gaps
+        project_recommendations = self._generate_project_recommendations(
+            target_role, career_stage, gaps, alignment_score
+        )
+        plan['projects_to_build'].extend(project_recommendations)
         
-        if 'Missing: LinkedIn, GitHub, or portfolio URL' in completeness_issues:
-            plan['portfolio_signals'].append("Create LinkedIn profile highlighting key achievements")
-            plan['portfolio_signals'].append("Build GitHub portfolio with 3-5 polished projects")
+        # Portfolio and profile improvements
+        portfolio_improvements = self._generate_portfolio_improvements(
+            completeness_issues, target_role, alignment_score
+        )
+        plan['portfolio_signals'].extend(portfolio_improvements)
         
-        plan['portfolio_signals'].append("Quantify all achievements with metrics (%, $, scale)")
-        plan['portfolio_signals'].append("Document projects with clear problem/solution/impact structure")
+        # Networking and application strategy
+        networking_strategy = self._generate_networking_strategy(
+            career_stage, target_role, alignment_score
+        )
+        plan['networking_applications'].extend(networking_strategy)
         
-        plan['networking_applications'].extend([
-            "Join professional communities and attend industry events",
-            "Network with 5-10 professionals in target role via informational interviews",
-            "Apply to 10-15 relevant positions tailored to target role",
-            "Get resume reviewed by 2-3 industry professionals"
-        ])
-        
-        plan['quarterly_milestones']['Q1'] = [
-            "Complete skills gap analysis and enroll in 1-2 courses",
-            "Update resume with quantified achievements",
-            "Start building portfolio project #1"
-        ]
-        
-        plan['quarterly_milestones']['Q2'] = [
-            "Complete portfolio project #1 with documentation",
-            "Start portfolio project #2",
-            "Begin networking with target companies"
-        ]
-        
-        plan['quarterly_milestones']['Q3'] = [
-            "Complete portfolio project #2",
-            "Polish LinkedIn and GitHub profiles",
-            "Apply to 5-10 positions and gather feedback"
-        ]
-        
-        plan['quarterly_milestones']['Q4'] = [
-            "Complete any remaining projects",
-            "Intensify job applications (10-15 companies)",
-            "Prepare for technical interviews and behavioral questions",
-            "Secure interviews and offers in target role"
-        ]
+        # Timeline recommendations (point-wise instead of quarterly)
+        timeline = self._generate_timeline_recommendations(
+            career_stage, alignment_score, gaps
+        )
+        plan['immediate_actions'] = timeline['immediate']
+        plan['short_term'] = timeline['short_term']
+        plan['long_term'] = timeline['long_term']
         
         return plan
+    
+    def _get_skill_learning_path(self, skill: str, target_role: str, career_stage: str) -> str:
+        skill_lower = skill.lower()
+        
+        # Programming languages
+        if any(lang in skill_lower for lang in ['python', 'javascript', 'java', 'c++', 'go', 'rust']):
+            return f"Master {skill} through hands-on projects - complete 3-5 real-world projects, contribute to open source, and earn relevant certification (e.g., Python PCEP, Java OCA)"
+        
+        # Cloud platforms
+        if any(cloud in skill_lower for cloud in ['aws', 'azure', 'gcp', 'cloud']):
+            return f"Gain {skill} proficiency - complete official certification (e.g., AWS Solutions Architect, Azure Administrator), build 2-3 cloud-hosted projects with CI/CD"
+        
+        # Data science/ML
+        if any(ds in skill_lower for ds in ['machine learning', 'deep learning', 'tensorflow', 'pytorch', 'scikit']):
+            return f"Build {skill} expertise - complete Coursera ML specialization or fast.ai course, implement 3-5 ML models on real datasets, participate in 2-3 Kaggle competitions"
+        
+        # Databases
+        if any(db in skill_lower for db in ['sql', 'postgresql', 'mongodb', 'database']):
+            return f"Develop {skill} competency - design and implement 3 complex database schemas, optimize query performance, learn indexing and transaction management, earn MySQL/PostgreSQL certification"
+        
+        # DevOps/Infrastructure
+        if any(devops in skill_lower for devops in ['docker', 'kubernetes', 'jenkins', 'ci/cd', 'terraform']):
+            return f"Master {skill} - set up complete CI/CD pipeline for 2-3 projects, containerize applications, automate deployments, earn relevant certification (CKA for Kubernetes)"
+        
+        # Generic fallback
+        return f"Acquire {skill} through structured learning - enroll in top-rated course (Udemy/Coursera), practice with 3-5 hands-on projects, build portfolio demonstrating proficiency"
+    
+    def _generate_project_recommendations(self, target_role: str, career_stage: str, gaps: List[str], alignment_score: int) -> List[str]:
+        projects = []
+        role_lower = target_role.lower()
+        
+        # Role-specific project recommendations
+        if 'data scientist' in role_lower or 'machine learning' in role_lower:
+            projects.append("Build end-to-end ML pipeline: data collection → preprocessing → model training → deployment with Flask/FastAPI → monitoring. Document all steps and results.")
+            projects.append("Complete 3-5 Kaggle competitions in different domains (NLP, Computer Vision, Time Series). Achieve top 20% ranking in at least one competition.")
+            projects.append("Create a production-ready ML project with A/B testing, model versioning (MLflow), and automated retraining pipeline. Deploy on AWS/GCP.")
+        
+        elif 'full stack' in role_lower or 'software engineer' in role_lower:
+            projects.append("Build a complete CRUD application with authentication, database (PostgreSQL/MongoDB), REST API, and modern frontend (React/Vue). Deploy on cloud with CI/CD.")
+            projects.append("Contribute to 2-3 popular open source projects - fix bugs, add features, improve documentation. Get at least 3 PRs merged.")
+            projects.append("Create a microservices architecture project with 3-4 services, API gateway, message queue (RabbitMQ/Kafka), and Docker/Kubernetes deployment.")
+        
+        elif 'frontend' in role_lower:
+            projects.append("Build 3-5 responsive, accessible web applications using modern framework (React/Vue/Angular) with state management, routing, and API integration.")
+            projects.append("Create a component library with Storybook documentation, unit tests (Jest), and publish to npm. Demonstrate reusability and best practices.")
+            projects.append("Develop a Progressive Web App (PWA) with offline support, push notifications, and optimal performance (Lighthouse score 90+).")
+        
+        elif 'backend' in role_lower or 'api' in role_lower:
+            projects.append("Design and implement RESTful API with authentication (JWT/OAuth), rate limiting, caching (Redis), and comprehensive API documentation (Swagger).")
+            projects.append("Build a scalable backend system handling 10,000+ requests/second - use load balancing, database optimization, and horizontal scaling strategies.")
+            projects.append("Create microservices with event-driven architecture using message queues (RabbitMQ/Kafka), implement circuit breaker pattern, and monitoring (Prometheus/Grafana).")
+        
+        elif 'devops' in role_lower or 'cloud' in role_lower:
+            projects.append("Implement complete CI/CD pipeline using Jenkins/GitLab CI with automated testing, security scanning, and multi-environment deployments (dev/staging/prod).")
+            projects.append("Set up Kubernetes cluster with auto-scaling, monitoring (Prometheus), logging (ELK stack), and deploy 3-4 microservices with zero-downtime deployments.")
+            projects.append("Build Infrastructure as Code (IaC) using Terraform/CloudFormation - create reusable modules for VPC, compute, storage, and implement disaster recovery.")
+        
+        elif 'data analyst' in role_lower:
+            projects.append("Create 3-5 interactive dashboards using Tableau/Power BI analyzing real datasets (sales, marketing, operations) with actionable insights and KPI tracking.")
+            projects.append("Perform comprehensive data analysis project: data cleaning → exploratory analysis → statistical testing → visualization → business recommendations. Document findings in professional report.")
+            projects.append("Build automated reporting system using Python (Pandas, Matplotlib) that generates weekly/monthly reports from database queries and emails stakeholders.")
+        
+        # Add career-stage specific additions
+        if career_stage in ["Student", "Recent Graduate"]:
+            projects.append("Complete 2-3 online courses with certificates (Coursera, edX, Udacity) in core technologies for " + target_role + " role.")
+        elif career_stage == "Mid-Level":
+            projects.append("Lead a technical initiative at work or in open source - mentor others, make architectural decisions, and document learnings in technical blog posts.")
+        
+        return projects[:6]  # Limit to top 6 most relevant
+    
+    def _generate_portfolio_improvements(self, completeness_issues: List[str], target_role: str, alignment_score: int) -> List[str]:
+        improvements = []
+        
+        # Check for missing elements
+        issues_str = ' '.join(completeness_issues)
+        
+        if 'LinkedIn' in issues_str or 'portfolio' in issues_str:
+            improvements.append("Create professional LinkedIn profile: professional photo, compelling headline, detailed experience with quantified achievements, 5+ recommendations, 500+ connections")
+            improvements.append("Build portfolio website showcasing 4-6 best projects with live demos, source code (GitHub), detailed case studies (problem → solution → impact), and technical blog posts")
+        
+        if 'GitHub' in issues_str:
+            improvements.append("Build strong GitHub presence: 4-6 pinned repositories with excellent README files, consistent contribution graph (green squares), contributions to popular open source projects")
+        
+        improvements.append("Quantify every achievement with metrics: 'Improved performance by 40%', 'Reduced costs by $50K annually', 'Led team of 5 engineers', 'Processed 1M+ records daily'")
+        improvements.append("Rewrite bullet points using STAR method (Situation → Task → Action → Result) with powerful action verbs (architected, optimized, spearheaded, orchestrated)")
+        improvements.append("Add technical skills section with proficiency levels: Expert (Python, SQL), Advanced (AWS, Docker), Intermediate (Kubernetes). Match keywords from " + target_role + " job descriptions")
+        
+        if alignment_score < 60:
+            improvements.append("Create 'Relevant Projects' section highlighting work that aligns with " + target_role + " requirements, even if from side projects or coursework")
+        
+        improvements.append("Get resume professionally reviewed by 2-3 industry professionals in " + target_role + " field. Incorporate feedback and A/B test different versions")
+        
+        return improvements[:8]
+    
+    def _generate_networking_strategy(self, career_stage: str, target_role: str, alignment_score: int) -> List[str]:
+        strategy = []
+        
+        strategy.append("Conduct 10-15 informational interviews with professionals in " + target_role + " positions at target companies - prepare thoughtful questions, build genuine relationships")
+        strategy.append("Join 3-5 relevant communities: Reddit (r/datascience, r/webdev), Discord servers, Slack groups. Actively participate, answer questions, share knowledge")
+        strategy.append("Attend 5-10 industry events: local meetups, tech conferences, workshops. Present a lightning talk or poster if possible. Follow up with meaningful connections")
+        
+        if career_stage in ["Student", "Recent Graduate"]:
+            strategy.append("Apply for internships and entry-level positions: target 50-100 applications over 3-6 months. Tailor resume and cover letter for each application")
+            strategy.append("Leverage university career services, alumni network, and career fairs. Request referrals from alumni working at target companies")
+        elif career_stage == "Mid-Level":
+            strategy.append("Target 30-50 companies where you want to work. Get warm introductions through mutual connections. Apply for mid-level/senior positions matching your experience")
+            strategy.append("Build thought leadership: write technical blog posts (2-4 per month), contribute to industry discussions on LinkedIn/Twitter, share project learnings")
+        else:
+            strategy.append("Leverage your network for direct referrals to senior/leadership positions. Focus on quality over quantity - target 15-20 companies strategically")
+            strategy.append("Establish thought leadership: speak at conferences, write authoritative articles, mentor others, contribute to industry standards/open source governance")
+        
+        if alignment_score < 50:
+            strategy.append("Consider contract/freelance projects in " + target_role + " to build experience while job searching. Use platforms like Upwork, Toptal, or direct client outreach")
+        
+        strategy.append("Prepare for interviews: practice 50+ coding problems (LeetCode/HackerRank), rehearse behavioral questions (STAR method), do mock interviews with peers/professionals")
+        strategy.append("Follow up systematically: send thank-you notes after interviews, maintain relationship with recruiters, ask for feedback on rejections to improve")
+        
+        return strategy[:10]
+    
+    def _generate_timeline_recommendations(self, career_stage: str, alignment_score: int, gaps: List[str]) -> Dict:
+        timeline = {
+            'immediate': [],  # 0-1 month
+            'short_term': [],  # 1-6 months
+            'long_term': []  # 6-12 months
+        }
+        
+        # Immediate actions (0-1 month)
+        timeline['immediate'].append("Update resume with quantified achievements and ATS-friendly formatting. Get it reviewed by 2-3 professionals")
+        timeline['immediate'].append("Optimize LinkedIn profile with professional photo, compelling headline, and detailed experience section")
+        timeline['immediate'].append("Identify top 3-5 skill gaps and enroll in relevant online courses (Coursera, Udemy, edX)")
+        
+        if alignment_score < 50:
+            timeline['immediate'].append("Start first portfolio project addressing biggest skill gap - dedicate 10-15 hours/week")
+        
+        timeline['immediate'].append("Join 2-3 professional communities (Reddit, Discord, LinkedIn groups) and start engaging with content")
+        
+        # Short-term actions (1-6 months)
+        timeline['short_term'].append("Complete 2-3 significant portfolio projects with detailed documentation, live demos, and GitHub repositories")
+        timeline['short_term'].append("Earn 1-2 relevant certifications (AWS, Google Cloud, specific technologies) to validate skills")
+        timeline['short_term'].append("Conduct 5-10 informational interviews and expand professional network by 50+ meaningful connections")
+        timeline['short_term'].append("Contribute to 2-3 open source projects - get at least 3 pull requests merged")
+        timeline['short_term'].append("Start applying to positions: tailor resume for each application, aim for 20-30 quality applications")
+        timeline['short_term'].append("Practice technical interviews: solve 50+ coding problems, do 3-5 mock interviews")
+        
+        if career_stage in ["Student", "Recent Graduate"]:
+            timeline['short_term'].append("Build strong foundation in core technologies through structured courses and hands-on practice (20+ hours/week)")
+        
+        # Long-term actions (6-12 months)
+        timeline['long_term'].append("Achieve measurable expertise: portfolio with 5-6 production-quality projects, 2-3 certifications, strong GitHub presence")
+        timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
+        timeline['long_term'].append("Expand to 50-70 total applications with systematic follow-ups. Convert at least 10% to interviews")
+        timeline['long_term'].append("Secure multiple offers through strategic networking and strong technical interviews. Negotiate compensation package")
+        
+        if alignment_score >= 70:
+            timeline['long_term'].append("Focus on interview preparation and applications - you're already well-qualified, now it's about landing the right opportunity")
+        else:
+            timeline['long_term'].append("Continue skill building while applying - demonstrate learning trajectory and growth mindset during interviews")
+        
+        return timeline
     
     def _enhance_with_gemini(self, base_plan: Dict, analysis: Dict, target_role: str, career_stage: str) -> Dict:
         job_description = get_job_description(target_role)

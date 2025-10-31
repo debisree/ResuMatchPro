@@ -222,67 +222,99 @@
     
     {% if analysis.improvement_plan %}
     <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-2xl font-bold text-gray-800 mb-4">1-Year Improvement Plan</h3>
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">📅 1-Year Improvement Plan for {{ analysis.target_role }}</h3>
+        <p class="text-sm text-gray-600 mb-6">Tailored roadmap based on your current profile and target role requirements</p>
         
         {% if analysis.improvement_plan.skills_to_acquire %}
-        <div class="mb-4">
-            <h4 class="font-bold text-gray-700 mb-2">Skills to Acquire:</h4>
-            <ul class="space-y-1 text-sm">
-                {% for skill in analysis.improvement_plan.skills_to_acquire[:5] %}
-                <li class="text-gray-600">• {{ skill }}</li>
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                <span class="text-blue-600 mr-2">📚</span> Skills Development Path
+            </h4>
+            <ul class="space-y-2 text-sm">
+                {% for skill in analysis.improvement_plan.skills_to_acquire %}
+                <li class="text-gray-700 pl-4 border-l-2 border-blue-200">{{ skill }}</li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
         
         {% if analysis.improvement_plan.projects_to_build %}
-        <div class="mb-4">
-            <h4 class="font-bold text-gray-700 mb-2">Projects to Build:</h4>
-            <ul class="space-y-1 text-sm">
-                {% for project in analysis.improvement_plan.projects_to_build[:5] %}
-                <li class="text-gray-600">• {{ project }}</li>
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                <span class="text-green-600 mr-2">🚀</span> Project Portfolio Building
+            </h4>
+            <ul class="space-y-2 text-sm">
+                {% for project in analysis.improvement_plan.projects_to_build %}
+                <li class="text-gray-700 pl-4 border-l-2 border-green-200">{{ project }}</li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
         
         {% if analysis.improvement_plan.portfolio_signals %}
-        <div class="mb-4">
-            <h4 class="font-bold text-gray-700 mb-2">Portfolio & Signals:</h4>
-            <ul class="space-y-1 text-sm">
-                {% for signal in analysis.improvement_plan.portfolio_signals[:5] %}
-                <li class="text-gray-600">• {{ signal }}</li>
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                <span class="text-purple-600 mr-2">💼</span> Profile & Portfolio Optimization
+            </h4>
+            <ul class="space-y-2 text-sm">
+                {% for signal in analysis.improvement_plan.portfolio_signals %}
+                <li class="text-gray-700 pl-4 border-l-2 border-purple-200">{{ signal }}</li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
         
         {% if analysis.improvement_plan.networking_applications %}
-        <div class="mb-4">
-            <h4 class="font-bold text-gray-700 mb-2">Networking & Applications:</h4>
-            <ul class="space-y-1 text-sm">
-                {% for item in analysis.improvement_plan.networking_applications[:5] %}
-                <li class="text-gray-600">• {{ item }}</li>
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                <span class="text-orange-600 mr-2">🤝</span> Networking & Job Application Strategy
+            </h4>
+            <ul class="space-y-2 text-sm">
+                {% for item in analysis.improvement_plan.networking_applications %}
+                <li class="text-gray-700 pl-4 border-l-2 border-orange-200">{{ item }}</li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
         
-        {% if analysis.improvement_plan.quarterly_milestones %}
-        <div>
-            <h4 class="font-bold text-gray-700 mb-3">Quarterly Milestones:</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {% for quarter in ['Q1', 'Q2', 'Q3', 'Q4'] %}
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h5 class="font-bold text-gray-800 mb-2">{{ quarter }}</h5>
-                    <ul class="space-y-1 text-sm">
-                        {% for milestone in analysis.improvement_plan.quarterly_milestones[quarter][:3] %}
-                        <li class="text-gray-600">• {{ milestone }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endfor %}
+        {% if analysis.improvement_plan.immediate_actions or analysis.improvement_plan.short_term or analysis.improvement_plan.long_term %}
+        <div class="border-t pt-6 mt-6">
+            <h4 class="font-bold text-gray-800 mb-4 flex items-center">
+                <span class="text-red-600 mr-2">⏱️</span> Timeline & Action Plan
+            </h4>
+            
+            {% if analysis.improvement_plan.immediate_actions %}
+            <div class="mb-5">
+                <h5 class="font-semibold text-gray-700 mb-2 text-sm">🔴 Immediate (0-1 Month)</h5>
+                <ul class="space-y-1.5 text-sm">
+                    {% for action in analysis.improvement_plan.immediate_actions %}
+                    <li class="text-gray-600 pl-3">• {{ action }}</li>
+                    {% endfor %}
+                </ul>
             </div>
+            {% endif %}
+            
+            {% if analysis.improvement_plan.short_term %}
+            <div class="mb-5">
+                <h5 class="font-semibold text-gray-700 mb-2 text-sm">🟡 Short-term (1-6 Months)</h5>
+                <ul class="space-y-1.5 text-sm">
+                    {% for action in analysis.improvement_plan.short_term %}
+                    <li class="text-gray-600 pl-3">• {{ action }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {% if analysis.improvement_plan.long_term %}
+            <div>
+                <h5 class="font-semibold text-gray-700 mb-2 text-sm">🟢 Long-term (6-12 Months)</h5>
+                <ul class="space-y-1.5 text-sm">
+                    {% for action in analysis.improvement_plan.long_term %}
+                    <li class="text-gray-600 pl-3">• {{ action }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
     </div>
