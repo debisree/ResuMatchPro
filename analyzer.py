@@ -15,13 +15,14 @@ from job_descriptions import get_job_description
 
 
 class ResumeAnalyzer:
-    def __init__(self, resume_text: str, target_role: Optional[str] = None, seniority_goal: Optional[str] = None):
+    def __init__(self, resume_text: str, target_role: Optional[str] = None, seniority_goal: Optional[str] = None, is_custom_jd: bool = False):
         self.text = resume_text.lower()
         self.original_text = resume_text
         # Store both original and lowercased target_role for custom JD support
         self.target_role_original = target_role
         self.target_role = target_role.lower() if target_role else None
         self.seniority_goal = seniority_goal
+        self.is_custom_jd = is_custom_jd
         
         self.emails = extract_emails(resume_text)
         self.phones = extract_phones(resume_text)
@@ -584,11 +585,8 @@ class ResumeAnalyzer:
                 'gaps': []
             }
         
-        # Determine if target_role is a custom JD or predefined role name
-        # If it's longer than 100 chars or has multiple lines, treat as custom JD
-        is_custom_jd = len(self.target_role) > 100 or '\n' in self.target_role
-        
-        if is_custom_jd:
+        # Use explicit flag to determine if this is a custom JD
+        if self.is_custom_jd:
             # Use the original casing for pattern matching (camelCase, PascalCase, etc.)
             job_description = self.target_role_original or self.target_role
             role_display = "this role"

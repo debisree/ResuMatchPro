@@ -126,6 +126,7 @@ async def analyze_resume(
     file: UploadFile = File(...),
     target_role: Optional[str] = Form(None),
     custom_jd: Optional[str] = Form(None),
+    jd_mode: Optional[str] = Form("predefined"),
     seniority_goal: Optional[str] = Form(None)
 ):
     session_id = get_session_id(request)
@@ -134,9 +135,11 @@ async def analyze_resume(
     if not target_role and not custom_jd:
         raise HTTPException(status_code=400, detail="Either select a predefined role or paste a custom job description")
     
-    # Use custom JD if provided, otherwise use target_role
-    if custom_jd and custom_jd.strip():
-        role_input = custom_jd.strip()
+    # Determine if using custom JD based on explicit mode
+    is_custom_jd = bool(jd_mode == "custom" and custom_jd and custom_jd.strip())
+    
+    if is_custom_jd:
+        role_input = (custom_jd or "").strip()
         display_role = "Custom Role"
     else:
         role_input = target_role or ""
@@ -158,7 +161,7 @@ async def analyze_resume(
         resume_text = parse_resume(file_path, filename)
         resume_text = normalize_text(resume_text)
         
-        analyzer = ResumeAnalyzer(resume_text, role_input, seniority_goal)
+        analyzer = ResumeAnalyzer(resume_text, role_input, seniority_goal, is_custom_jd=is_custom_jd)
         analysis_result = analyzer.analyze()
         
         plan = plan_gen.generate_plan(
