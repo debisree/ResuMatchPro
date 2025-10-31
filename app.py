@@ -14,6 +14,7 @@ from analyzer import ResumeAnalyzer
 from plan_generator import ImprovementPlanGenerator
 from database import Database
 from report_generator import ReportGenerator
+from salary_analyzer import get_salary_analysis
 
 app = FastAPI(title="ResuMatch")
 
@@ -127,13 +128,18 @@ async def analyze_resume(
     target_role: Optional[str] = Form(None),
     custom_jd: Optional[str] = Form(None),
     jd_mode: Optional[str] = Form("predefined"),
-    seniority_goal: Optional[str] = Form(None)
+    seniority_goal: Optional[str] = Form(None),
+    location: Optional[str] = Form(None)
 ):
     session_id = get_session_id(request)
     
     # Validate that either target_role or custom_jd is provided
     if not target_role and not custom_jd:
         raise HTTPException(status_code=400, detail="Either select a predefined role or paste a custom job description")
+    
+    # Validate location
+    if not location or not location.strip():
+        raise HTTPException(status_code=400, detail="Location is required for salary analysis")
     
     # Determine if using custom JD based on explicit mode
     is_custom_jd = bool(jd_mode == "custom" and custom_jd and custom_jd.strip())
@@ -173,6 +179,19 @@ async def analyze_resume(
         
         keywords = plan.get('gemini_keywords') or analyzer.generate_tailored_keywords()
         analysis_result['tailored_keywords'] = keywords
+        
+        # Add salary analysis
+        try:
+            salary_analysis = get_salary_analysis(
+                role=display_role,
+                location=location.strip(),
+                career_stage=analysis_result['career_stage'],
+                alignment_score=analysis_result['role_alignment']['score']
+            )
+            analysis_result['salary_analysis'] = salary_analysis
+        except Exception as e:
+            print(f"Salary analysis failed: {e}")
+            analysis_result['salary_analysis'] = {'available': False, 'message': 'Salary data temporarily unavailable'}
         
         analysis_id = db.save_analysis(
             session_id,

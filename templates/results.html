@@ -220,6 +220,82 @@
     </div>
     {% endif %}
     
+    {% if analysis.salary_analysis and analysis.salary_analysis.available %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            <span class="text-green-600 mr-2">💰</span> Salary Analysis & Market Insights
+        </h3>
+        
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">
+                <strong>Role:</strong> {{ analysis.salary_analysis.normalized_role }} | 
+                <strong>Location:</strong> {{ analysis.salary_analysis.normalized_location }} | 
+                <strong>Career Stage:</strong> {{ analysis.salary_analysis.career_stage }}
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-200">
+                <p class="text-sm text-gray-600 mb-1">Your Expected Salary</p>
+                <p class="text-3xl font-bold text-yellow-700">${{ analysis.salary_analysis.current_expected_salary }}K</p>
+                <p class="text-xs text-gray-500 mt-1">Based on current profile</p>
+            </div>
+            
+            <div class="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+                <p class="text-sm text-gray-600 mb-1">Target After Improvements</p>
+                <p class="text-3xl font-bold text-green-700">${{ analysis.salary_analysis.target_salary_after_improvement }}K</p>
+                <p class="text-xs text-gray-500 mt-1">With skill development</p>
+            </div>
+            
+            <div class="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                <p class="text-sm text-gray-600 mb-1">Potential Salary Hike</p>
+                <p class="text-3xl font-bold text-blue-700">+${{ analysis.salary_analysis.potential_hike_amount }}K</p>
+                <p class="text-xs text-green-600 font-medium mt-1">+{{ analysis.salary_analysis.potential_hike_percent }}% increase</p>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-700 mb-3">Market Salary Distribution</h4>
+            <img 
+                src="data:image/png;base64,{{ analysis.salary_analysis.histogram_base64 }}" 
+                alt="Salary Distribution Histogram"
+                class="w-full rounded-lg border border-gray-200"
+            >
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-bold text-gray-700 mb-2">Market Percentiles (Annual Salary)</h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+                <div>
+                    <p class="text-gray-600">10th Percentile</p>
+                    <p class="font-semibold text-gray-800">${{ analysis.salary_analysis.market_percentiles['10th'] }}K</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">25th Percentile</p>
+                    <p class="font-semibold text-gray-800">${{ analysis.salary_analysis.market_percentiles['25th'] }}K</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Median (50th)</p>
+                    <p class="font-semibold text-gray-800">${{ analysis.salary_analysis.market_percentiles.median }}K</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">75th Percentile</p>
+                    <p class="font-semibold text-gray-800">${{ analysis.salary_analysis.market_percentiles['75th'] }}K</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">90th Percentile</p>
+                    <p class="font-semibold text-gray-800">${{ analysis.salary_analysis.market_percentiles['90th'] }}K</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-500 italic">
+            <p><strong>Data Source:</strong> {{ analysis.salary_analysis.data_source }}</p>
+            <p class="mt-1">Note: Salary ranges are based on government employment statistics and represent typical compensation for the role. Actual offers may vary based on company size, industry, experience, and negotiation.</p>
+        </div>
+    </div>
+    {% endif %}
+    
     {% if analysis.improvement_plan %}
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-2xl font-bold text-gray-800 mb-4">📅 1-Year Improvement Plan for {{ analysis.target_role }}</h3>
