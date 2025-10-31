@@ -56,6 +56,13 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-10-31: **🤖 AI-Powered Alignment Scoring** - Gemini AI now calculates resume-job match:
+  - Uses `gemini-2.0-flash-exp` for semantic understanding of resume vs job description
+  - Understands context: "led team of 5" = leadership, "statistical analysis" = "statistical modeling"
+  - Weights importance: knows "PhD in ML" matters more than "Excel" for ML Engineer roles
+  - Returns 0-100 score with matched strengths and key gaps
+  - Automatic fallback to keyword matching if GOOGLE_API_KEY not set or Gemini unavailable
+  - Visual indicators: 🤖 AI Analysis (Gemini) vs 📊 Keyword Analysis (rule-based)
 - 2025-10-31: **Custom Job Description Support** - Now accepts pasted job descriptions OR predefined roles:
   - Added radio toggle: "Quick Start (Predefined Roles)" vs "Paste Real Job Description"
   - Users can paste actual job postings for accurate alignment to real requirements
