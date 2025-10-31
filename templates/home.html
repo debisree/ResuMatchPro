@@ -105,17 +105,122 @@ We're looking for a Data Scientist with strong Python skills, experience with ma
         
         <div>
             <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
-                Location <span class="text-red-500">*</span>
+                Current Location <span class="text-red-500">*</span>
             </label>
-            <input 
-                type="text" 
+            <select 
                 id="location" 
                 name="location" 
                 required
-                placeholder="e.g., San Francisco, CA or New York, NY"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
+                <option value="">-- Select your location --</option>
+                <option value="NYC/NJ">NYC/NJ</option>
+                <option value="SFO">SFO</option>
+                <option value="LA">LA</option>
+                <option value="San Diego">San Diego</option>
+                <option value="Boston">Boston</option>
+                <option value="DC">DC</option>
+                <option value="Raleigh/Durham">Raleigh/Durham</option>
+                <option value="Houston">Houston</option>
+                <option value="Dallas">Dallas</option>
+                <option value="Austin">Austin</option>
+            </select>
             <p class="text-sm text-gray-500 mt-1">Used for salary analysis and market insights</p>
+        </div>
+        
+        <div>
+            <label for="domain" class="block text-sm font-medium text-gray-700 mb-2">
+                Domain Specialization (Optional)
+            </label>
+            <input 
+                type="text" 
+                id="domain" 
+                name="domain" 
+                placeholder="e.g., Data Science in Fintech, ML in Healthcare, Cloud in E-commerce"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+            <p class="text-sm text-gray-500 mt-1">Specify your industry or domain expertise</p>
+        </div>
+        
+        <!-- Career Goals Panel -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                🎯 Career Goals & Aspirations
+            </h3>
+            <p class="text-sm text-gray-600">Help us create a personalized roadmap for your career journey</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="career_goal" class="block text-sm font-medium text-gray-700 mb-2">
+                        Career Goal <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="career_goal" 
+                        name="career_goal" 
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                        <option value="">-- Select your goal --</option>
+                        <option value="promotion">Promotion (Next level in current field)</option>
+                        <option value="pivot">Career Pivot (Switch role/industry)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="timeframe" class="block text-sm font-medium text-gray-700 mb-2">
+                        Timeframe <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="timeframe" 
+                        name="timeframe" 
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                        <option value="">-- Select timeframe --</option>
+                        <option value="6">6 Months</option>
+                        <option value="12">1 Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label for="target_location" class="block text-sm font-medium text-gray-700 mb-2">
+                    Target Location <span class="text-red-500">*</span>
+                </label>
+                <select 
+                    id="target_location" 
+                    name="target_location" 
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                    <option value="">-- Select target location --</option>
+                    <option value="NYC/NJ">NYC/NJ</option>
+                    <option value="SFO">SFO</option>
+                    <option value="LA">LA</option>
+                    <option value="San Diego">San Diego</option>
+                    <option value="Boston">Boston</option>
+                    <option value="DC">DC</option>
+                    <option value="Raleigh/Durham">Raleigh/Durham</option>
+                    <option value="Houston">Houston</option>
+                    <option value="Dallas">Dallas</option>
+                    <option value="Austin">Austin</option>
+                </select>
+                <p class="text-sm text-gray-500 mt-1">Where do you want to work? (Can be same as current)</p>
+            </div>
+            
+            <div>
+                <label for="target_domain" class="block text-sm font-medium text-gray-700 mb-2">
+                    Target Domain (Optional)
+                </label>
+                <input 
+                    type="text" 
+                    id="target_domain" 
+                    name="target_domain" 
+                    placeholder="e.g., AI/ML in Finance, Cloud Engineering in Healthcare"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                >
+                <p class="text-sm text-gray-500 mt-1">What domain/industry do you want to target?</p>
+            </div>
         </div>
         
         <div>
