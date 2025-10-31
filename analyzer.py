@@ -18,6 +18,8 @@ class ResumeAnalyzer:
     def __init__(self, resume_text: str, target_role: Optional[str] = None, seniority_goal: Optional[str] = None):
         self.text = resume_text.lower()
         self.original_text = resume_text
+        # Store both original and lowercased target_role for custom JD support
+        self.target_role_original = target_role
         self.target_role = target_role.lower() if target_role else None
         self.seniority_goal = seniority_goal
         
@@ -582,24 +584,79 @@ class ResumeAnalyzer:
                 'gaps': []
             }
         
-        # Get the actual job description for this role
-        job_description = get_job_description(self.target_role)
+        # Determine if target_role is a custom JD or predefined role name
+        # If it's longer than 100 chars or has multiple lines, treat as custom JD
+        is_custom_jd = len(self.target_role) > 100 or '\n' in self.target_role
+        
+        if is_custom_jd:
+            # Use the original casing for pattern matching (camelCase, PascalCase, etc.)
+            job_description = self.target_role_original or self.target_role
+            role_display = "this role"
+        else:
+            # Get the predefined job description
+            job_description = get_job_description(self.target_role)
+            role_display = self.target_role
         
         # Extract requirements from the job description
         required_skills = self._extract_requirements_from_jd(job_description)
         
         if not required_skills:
-            # Fallback to old method if no requirements extracted
+            # Fallback if no requirements extracted
             return {
                 'score': 0,
                 'level': self.detect_career_stage(),
-                'alignment_details': f'Could not extract requirements for {self.target_role}',
+                'alignment_details': f'Could not extract requirements from job description',
                 'gaps': []
             }
         
-        # Check which requirements are present in resume
-        matched_skills = [skill for skill in required_skills if skill in self.text]
-        missing_skills = [skill for skill in required_skills if skill not in self.text]
+        # Semantic synonym mapping to catch similar terms
+        # Maps common term variations to a canonical form
+        synonym_groups = {
+            'statistical modeling': ['statistical analysis', 'statistical data analysis', 'statistics', 'statistical methods'],
+            'statistical analysis': ['statistical modeling', 'statistical data analysis', 'statistics', 'statistical methods'],
+            'data visualization': ['data viz', 'visualization', 'visualize', 'visualizing', 'charts', 'graphs', 'plotting'],
+            'machine learning': ['ml', 'machine-learning', 'statistical learning', 'predictive modeling'],
+            'deep learning': ['dl', 'neural networks', 'deep neural networks'],
+            'natural language processing': ['nlp', 'text analysis', 'text processing', 'language processing'],
+            'computer vision': ['cv', 'image processing', 'image recognition', 'visual recognition'],
+            'data engineering': ['data pipeline', 'etl', 'data pipelines'],
+            'cloud computing': ['cloud', 'cloud infrastructure', 'cloud platforms'],
+            'container': ['docker', 'containerization', 'containers'],
+            'orchestration': ['kubernetes', 'k8s', 'container orchestration'],
+            'ci/cd': ['continuous integration', 'continuous deployment', 'cicd', 'ci-cd'],
+            'version control': ['git', 'source control', 'vcs'],
+            'power bi': ['powerbi', 'microsoft power bi', 'bi tool'],
+            'tableau': ['tableau desktop', 'tableau server', 'bi tool'],
+            'excel': ['microsoft excel', 'spreadsheet', 'spreadsheets'],
+            'sql': ['structured query language', 'database query', 'querying'],
+            'nosql': ['no-sql', 'non-relational database', 'document database'],
+            'rest api': ['rest', 'restful', 'api', 'web api'],
+            'graphql': ['graph-ql', 'query language'],
+            'agile': ['scrum', 'agile methodology', 'agile development'],
+            'leadership': ['team lead', 'leading', 'mentoring', 'coaching'],
+        }
+        
+        # Check which requirements are present in resume (with synonym matching)
+        matched_skills = []
+        missing_skills = []
+        
+        for skill in required_skills:
+            # Direct match
+            if skill in self.text:
+                matched_skills.append(skill)
+                continue
+            
+            # Check synonyms
+            found_synonym = False
+            if skill in synonym_groups:
+                for synonym in synonym_groups[skill]:
+                    if synonym in self.text:
+                        matched_skills.append(skill)
+                        found_synonym = True
+                        break
+            
+            if not found_synonym:
+                missing_skills.append(skill)
         
         # Calculate alignment score
         alignment_score = int((len(matched_skills) / len(required_skills)) * 100)
@@ -611,13 +668,13 @@ class ResumeAnalyzer:
         
         # Create detailed alignment message
         if alignment_score >= 80:
-            alignment_msg = f"Excellent match! Resume covers {len(matched_skills)}/{len(required_skills)} key requirements for {self.target_role}"
+            alignment_msg = f"Excellent match! Resume covers {len(matched_skills)}/{len(required_skills)} key requirements for {role_display}"
         elif alignment_score >= 60:
-            alignment_msg = f"Good fit with room to improve. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}"
+            alignment_msg = f"Good fit with room to improve. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
         elif alignment_score >= 40:
-            alignment_msg = f"Moderate alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}"
+            alignment_msg = f"Moderate alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}"
         else:
-            alignment_msg = f"Low alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {self.target_role}. Consider building more relevant experience."
+            alignment_msg = f"Low alignment. Resume covers {len(matched_skills)}/{len(required_skills)} requirements for {role_display}. Consider building more relevant experience."
         
         return {
             'score': alignment_score,
