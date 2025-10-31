@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List, Optional
+from job_descriptions import get_job_description
 
 try:
     import google.generativeai as genai
@@ -115,24 +116,29 @@ class ImprovementPlanGenerator:
         return plan
     
     def _enhance_with_gemini(self, base_plan: Dict, analysis: Dict, target_role: str, career_stage: str) -> Dict:
-        prompt = f"""You are a career advisor helping someone transition to a {target_role} role. 
+        job_description = get_job_description(target_role)
         
+        prompt = f"""You are a career advisor helping someone transition to a {target_role} role. 
+
+Typical {target_role} Job Description:
+{job_description}
+
 Current career stage: {career_stage}
 Resume analysis summary:
 - Overall score: {analysis.get('overall_score', 0)}/120
 - Role alignment: {analysis.get('role_alignment', {}).get('score', 0)}%
 - Key gaps: {', '.join(analysis.get('role_alignment', {}).get('gaps', [])[:5])}
 
-Provide:
-1. 6-10 tailored impact keywords/action verbs specific to {target_role}
-2. One refined suggestion for each section: skills to acquire, projects to build, portfolio signals, networking
+Based on the job description requirements above, provide:
+1. 6-10 tailored impact keywords/action verbs that match this role's requirements
+2. One refined, specific suggestion for each section based on what employers want
 
 Keep response concise and actionable. Format as:
 KEYWORDS: keyword1, keyword2, keyword3, ...
-SKILLS: one specific skill recommendation
-PROJECTS: one specific project recommendation  
-PORTFOLIO: one specific portfolio recommendation
-NETWORKING: one specific networking recommendation
+SKILLS: one specific skill recommendation aligned with job requirements
+PROJECTS: one specific project recommendation that demonstrates required skills
+PORTFOLIO: one specific portfolio recommendation to stand out to hiring managers
+NETWORKING: one specific networking recommendation to break into this field
 """
         
         try:
@@ -173,13 +179,13 @@ NETWORKING: one specific networking recommendation
     
     def get_tailored_keywords(self, analysis: Dict, target_role: str) -> List[str]:
         if self.gemini_available:
-            prompt = f"""List 6-10 powerful action verbs and impact keywords specifically for a {target_role} role.
+            job_description = get_job_description(target_role)
             
-Focus on verbs that show:
-- Technical expertise
-- Business impact  
-- Leadership and collaboration
-- Innovation and problem-solving
+            prompt = f"""Based on this {target_role} job description:
+{job_description}
+
+List 6-10 powerful action verbs and impact keywords that would resonate with hiring managers for this role.
+Focus on verbs that demonstrate the required skills and responsibilities.
 
 Return only the keywords, comma-separated."""
             

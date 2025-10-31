@@ -215,15 +215,19 @@ class ResumeAnalyzer:
         impact_density = (impact_count / max(word_count, 1)) * 50
         impact_score = min(int(impact_density * 6), 6)
         score += impact_score
-        if impact_score < 3:
-            details.append("Use more action verbs (optimized, deployed, led, etc.)")
+        if impact_score == 0:
+            details.append("Start sentences with strong action verbs: 'Developed', 'Led', 'Architected', 'Optimized', 'Built' instead of passive phrases")
+        elif impact_score < 3:
+            details.append(f"Use 2-3 more impact verbs in summary. Examples: 'Spearheaded', 'Drove', 'Engineered', 'Scaled', 'Delivered'")
         
         evidence_count = len([m for m in METRIC_PATTERNS if re.search(m, summary_window, re.IGNORECASE)])
         evidence_density = (evidence_count / max(word_count, 1)) * 50
         evidence_score = min(int(evidence_density * 4), 4)
         score += evidence_score
-        if evidence_score < 2:
-            details.append("Add quantifiable metrics and outcomes")
+        if evidence_score == 0:
+            details.append("Add 1-2 quantifiable achievements in summary: 'Built system serving 10K+ users' or 'Reduced processing time by 40%'")
+        elif evidence_score < 2:
+            details.append("Add one more metric to strengthen summary impact (team size, project scale, or performance improvement)")
         
         faithfulness_penalty = 0
         if any(kw in summary_lower for kw in ['led', 'managed', 'leadership']):
@@ -263,8 +267,10 @@ class ResumeAnalyzer:
         degree_score = min(degree_count * 2, 10)
         score += degree_score
         
-        if degree_score < 4:
-            details.append("Add degree type (BS, MS, PhD, etc.)")
+        if degree_score == 0:
+            details.append("Include your degree type: Bachelor's (BS/BA), Master's (MS/MA), or PhD")
+        elif degree_score < 4:
+            details.append("Specify full degree name (e.g., 'BS Computer Science' or 'Master of Business Administration')")
         
         if self.years:
             year_score = min(len(self.years), 7)
@@ -272,10 +278,14 @@ class ResumeAnalyzer:
         else:
             details.append("Add graduation year(s)")
         
-        if 'thesis' in self.text or 'capstone' in self.text or 'dissertation' in self.text:
+        thesis_found = 'thesis' in self.text or 'capstone' in self.text or 'dissertation' in self.text
+        if thesis_found:
             score += 2
-        elif self.detect_career_stage() in ["Student", "Recent Graduate"]:
-            details.append("Consider adding thesis/capstone project")
+        else:
+            if self.detect_career_stage() in ["Student", "Recent Graduate"]:
+                details.append("Missing 2 points: Add thesis/capstone/final project to reach 29-30/30")
+            else:
+                details.append("Optional: Add thesis/capstone/dissertation if applicable (+2 points)")
         
         gpa_pattern = r'(?:gpa|grade point average)[:\s]+(\d+\.\d+)'
         gpa_match = re.search(gpa_pattern, self.text, re.IGNORECASE)
@@ -296,7 +306,9 @@ class ResumeAnalyzer:
             score += 3
         else:
             if self.detect_career_stage() in ["Student", "Recent Graduate"]:
-                details.append("Add GPA if >= 3.0 or academic honors")
+                details.append("Missing 3 points: Add GPA if >= 3.0 or academic honors (Dean's List, Cum Laude, etc.)")
+            else:
+                details.append("Optional: Add GPA (if 3.5+) or academic honors for +1 to +3 points")
         
         return {
             'score': score,
@@ -331,8 +343,12 @@ class ResumeAnalyzer:
         metrics_in_exp = len(self.metrics)
         quantified_score = min(metrics_in_exp, 8)
         score += quantified_score
-        if metrics_in_exp < 4:
-            details.append("Add more quantifiable outcomes (percentages, dollar amounts, scale)")
+        if metrics_in_exp == 0:
+            details.append("Add quantifiable outcomes: user counts (100+ users), time savings (reduced by 2 hours), scale (managed 5-person team), or quality improvements (improved accuracy to 95%)")
+        elif metrics_in_exp < 3:
+            details.append(f"Good start with {metrics_in_exp} metric(s)! Add 2-3 more: team size, project scope, timeframes, or quality/efficiency gains")
+        elif metrics_in_exp < 5:
+            details.append(f"Strong use of {metrics_in_exp} metrics. Consider adding 1-2 more if applicable (percentages work even without exact dollar figures)")
         
         exp_years = self.years_experience
         if exp_years < 1:

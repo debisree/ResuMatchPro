@@ -44,6 +44,104 @@
         </div>
     </div>
     
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Detailed Feedback</h2>
+        <div class="space-y-6">
+            <div class="border-l-4 border-blue-500 pl-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    1. Contacts & Links 
+                    <span class="text-sm font-normal text-gray-600">(Part of Completeness: {{ analysis.completeness.score }}/30 - {{ analysis.completeness.band }})</span>
+                </h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    {% set contact_feedback = [] %}
+                    {% for detail in analysis.completeness.details %}
+                        {% if 'Email' in detail or 'Phone' in detail or 'LinkedIn' in detail or 'GitHub' in detail or 'portfolio' in detail %}
+                            {% set _ = contact_feedback.append(detail) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if contact_feedback %}
+                        {% for item in contact_feedback %}
+                        <p>• {{ item }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-green-600">✓ All contact information present</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="border-l-4 border-purple-500 pl-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    2. Summary Quality
+                    <span class="text-sm font-normal text-gray-600">({{ analysis.summary.score }}/30 - {{ analysis.summary.band }})</span>
+                </h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    {% if analysis.summary.details %}
+                        {% for detail in analysis.summary.details %}
+                        <p>• {{ detail }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-green-600">✓ Summary is well-crafted</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="border-l-4 border-green-500 pl-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    3. Education
+                    <span class="text-sm font-normal text-gray-600">({{ analysis.education.score }}/30 - {{ analysis.education.band }})</span>
+                </h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    {% if analysis.education.details %}
+                        {% for detail in analysis.education.details %}
+                        <p>• {{ detail }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-green-600">✓ Education section is complete</p>
+                    {% endif %}
+                    {% if analysis.education.score == 30 %}
+                        <p class="text-green-600 font-medium">Perfect score! Your education section has all recommended elements.</p>
+                    {% elif analysis.education.score >= 27 %}
+                        <p class="text-gray-600 italic">Nearly perfect! Minor improvements: {% if not analysis.education.details %}Consider adding thesis/capstone or GPA if 3.5+{% endif %}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="border-l-4 border-orange-500 pl-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    4. Employment & Experience
+                    <span class="text-sm font-normal text-gray-600">({{ analysis.employment.score }}/30 - {{ analysis.employment.band }})</span>
+                </h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    {% if analysis.employment.details %}
+                        {% for detail in analysis.employment.details %}
+                        <p>• {{ detail }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-green-600">✓ Employment section is strong</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="border-l-4 border-gray-500 pl-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    5. Other Sections & ATS Readiness
+                </h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    {% for detail in analysis.completeness.details %}
+                        {% if 'Skills' in detail or 'short' in detail or 'long' in detail or 'section' in detail %}
+                        <p>• {{ detail }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    <p class="mt-2"><strong>ATS Status:</strong> 
+                        <span class="{% if analysis.ats_readiness.verdict == 'Pass' %}text-green-600{% else %}text-yellow-600{% endif %}">
+                            {{ analysis.ats_readiness.verdict }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-3">Completeness</h3>
