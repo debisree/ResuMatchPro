@@ -156,7 +156,7 @@ class SalaryAnalyzer:
         
         return 'software engineer'  # Default fallback
     
-    def _adjust_for_career_stage(self, percentiles: List[float], career_stage: str) -> Tuple[float, float]:
+    def _adjust_for_career_stage(self, percentiles: List[int], career_stage: str) -> Tuple[float, float]:
         """
         Adjust salary expectation based on career stage
         Returns (expected_salary, target_salary_after_improvement)
@@ -258,7 +258,7 @@ class SalaryAnalyzer:
     
     def _generate_histogram(
         self, 
-        percentiles: List[float], 
+        percentiles: List[int], 
         current_expected: float, 
         target_salary: float,
         role: str,
