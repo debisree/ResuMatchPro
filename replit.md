@@ -56,10 +56,19 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-10-31: Enhanced URL detection - detects hyperlinked keywords (LinkedIn, GitHub, Kaggle) even when URLs are hidden
+- 2025-10-31: Added detailed section-by-section feedback below overall score (Contacts/Links, Summary, Education, Employment, Misc)
+- 2025-10-31: Sharpened analysis rules with specific point breakdowns (e.g., "Missing 8 points: Add 3 more metrics...")
+- 2025-10-31: Enhanced Gemini AI to use real tech job descriptions for role-specific keywords and advice
+- 2025-10-31: Fixed Gemini model name (gemini-pro) and now uses ALL generated keywords (not limited to 10)
+- 2025-10-31: Created SCORING_SYSTEM.md explaining how each category is scored (0-30 points each)
 - 2025-10-30: Initial implementation with all core features
 
 ## User Preferences
-None yet.
+- Wants detailed, specific feedback explaining exactly why points were deducted
+- Prefers realistic suggestions (especially for quantifiable metrics when exact %/$ not available)
+- Wants to understand the scoring breakdown clearly
+- Focuses on tech roles (ML Engineer, Data Scientist, Software Engineer, etc.)
 
 ## Architecture Decisions
 - Single-service architecture (no microservices)

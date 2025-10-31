@@ -17,7 +17,7 @@ class ImprovementPlanGenerator:
         if self.gemini_available:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-1.5-flash')
+                self.model = genai.GenerativeModel('gemini-pro')
             except Exception:
                 self.gemini_available = False
     
@@ -148,7 +148,7 @@ NETWORKING: one specific networking recommendation to break into this field
             keywords = []
             if 'KEYWORDS:' in text:
                 keywords_line = text.split('KEYWORDS:')[1].split('\n')[0]
-                keywords = [k.strip() for k in keywords_line.split(',')]
+                keywords = [k.strip() for k in keywords_line.split(',') if k.strip()]
             
             if 'SKILLS:' in text:
                 skills_line = text.split('SKILLS:')[1].split('\n')[0].strip()
@@ -170,7 +170,7 @@ NETWORKING: one specific networking recommendation to break into this field
                 if networking_line:
                     base_plan['networking_applications'].insert(0, networking_line)
             
-            base_plan['gemini_keywords'] = keywords[:10]
+            base_plan['gemini_keywords'] = keywords
             
         except Exception as e:
             print(f"Error enhancing plan with Gemini: {e}")
@@ -191,8 +191,8 @@ Return only the keywords, comma-separated."""
             
             try:
                 response = self.model.generate_content(prompt)
-                keywords = [k.strip() for k in response.text.split(',')]
-                return keywords[:10]
+                keywords = [k.strip() for k in response.text.split(',') if k.strip()]
+                return keywords
             except Exception:
                 pass
         

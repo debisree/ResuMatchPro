@@ -275,8 +275,10 @@ class ResumeAnalyzer:
         if self.years:
             year_score = min(len(self.years), 7)
             score += year_score
+            if year_score < 7:
+                details.append(f"Gained {year_score} points for dates. Add more years/dates to reach full {7-year_score} additional points")
         else:
-            details.append("Add graduation year(s)")
+            details.append("Missing 7 points: Add graduation year (e.g., 'BS Computer Science, 2020' or 'Expected May 2025')")
         
         thesis_found = 'thesis' in self.text or 'capstone' in self.text or 'dissertation' in self.text
         if thesis_found:
@@ -337,18 +339,24 @@ class ResumeAnalyzer:
         
         bullet_score = min(bullet_count // 2, 6)
         score += bullet_score
-        if bullet_count < 6:
-            details.append(f"Add more bullet points ({bullet_count} found, aim for 8-12)")
+        if bullet_count == 0:
+            details.append(f"Missing {6-bullet_score} points: Add 8-12 bullet points describing your responsibilities and achievements")
+        elif bullet_count < 6:
+            details.append(f"Missing {6-bullet_score} points: Have {bullet_count} bullets, add {8-bullet_count} more for optimal impact (aim for 8-12 total)")
+        elif bullet_count < 8:
+            details.append(f"Good! {bullet_count} bullets present. Consider adding 1-2 more to showcase full impact")
         
         metrics_in_exp = len(self.metrics)
         quantified_score = min(metrics_in_exp, 8)
         score += quantified_score
         if metrics_in_exp == 0:
-            details.append("Add quantifiable outcomes: user counts (100+ users), time savings (reduced by 2 hours), scale (managed 5-person team), or quality improvements (improved accuracy to 95%)")
+            details.append(f"Missing {8-quantified_score} points: Add quantifiable outcomes - Examples: 'Served 10K+ users', 'Reduced costs by 30%', 'Led team of 5', 'Improved performance by 2x', 'Completed in 3 months'")
         elif metrics_in_exp < 3:
-            details.append(f"Good start with {metrics_in_exp} metric(s)! Add 2-3 more: team size, project scope, timeframes, or quality/efficiency gains")
+            details.append(f"Missing {8-quantified_score} points: Have {metrics_in_exp} metric(s). Add {5-metrics_in_exp} more - try: team size, user counts, time saved, % improvements, project budget/scope")
         elif metrics_in_exp < 5:
-            details.append(f"Strong use of {metrics_in_exp} metrics. Consider adding 1-2 more if applicable (percentages work even without exact dollar figures)")
+            details.append(f"Missing {8-quantified_score} points: Strong with {metrics_in_exp} metrics! Add {8-metrics_in_exp} more if possible (even approximate numbers like '50+ clients' count)")
+        elif metrics_in_exp < 8:
+            details.append(f"Excellent! {metrics_in_exp} metrics found. Add {8-metrics_in_exp} more to reach perfect score")
         
         exp_years = self.years_experience
         if exp_years < 1:
@@ -362,7 +370,7 @@ class ResumeAnalyzer:
         score += exp_score
         
         if not self.date_ranges:
-            details.append("Add date ranges for all positions")
+            details.append("Missing points: Add date ranges for all positions (e.g., 'June 2020 - Present' or '2019-2021')")
         
         return {
             'score': score,
@@ -482,14 +490,8 @@ class ResumeAnalyzer:
         if gemini_keywords:
             return gemini_keywords
         
-        keywords = []
-        
-        resume_verbs = [v for v in IMPACT_VERBS if v in self.text]
         missing_verbs = [v for v in IMPACT_VERBS if v not in self.text]
-        
-        keywords.extend(missing_verbs[:10])
-        
-        return keywords
+        return missing_verbs[:15]
     
     def _get_band(self, score: int, max_score: int) -> str:
         pct = (score / max_score) * 100
