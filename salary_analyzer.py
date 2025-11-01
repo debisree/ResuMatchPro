@@ -326,10 +326,220 @@ class SalaryAnalyzer:
         plt.close(fig)
         
         return image_base64
+    
+    def analyze_salary_comparison(
+        self,
+        role: str,
+        current_location: str,
+        target_location: str,
+        career_stage: str,
+        alignment_score: int
+    ) -> Dict:
+        """
+        Compare salary distributions between current and target locations for the same role
+        
+        Args:
+            role: Target job role
+            current_location: Current geographic location
+            target_location: Target geographic location
+            career_stage: Career stage (Student, Mid-Level, Senior, etc.)
+            alignment_score: Role alignment score (0-100)
+        
+        Returns:
+            Dict with both salary analyses and comparison histogram
+        """
+        normalized_role = self._normalize_role(role)
+        normalized_current_loc = self._normalize_location(current_location)
+        normalized_target_loc = self._normalize_location(target_location)
+        
+        # Get salary data
+        if normalized_role not in SALARY_DATABASE:
+            return {
+                'available': False,
+                'message': f'Salary data not available for {role}. Add more common roles to receive salary insights.'
+            }
+        
+        role_data = SALARY_DATABASE[normalized_role]
+        
+        # Get percentiles for both locations
+        current_percentiles = role_data.get(normalized_current_loc, role_data.get('Austin'))
+        target_percentiles = role_data.get(normalized_target_loc, role_data.get('Austin'))
+        
+        # Calculate expected salaries for both locations
+        current_expected, current_target = self._adjust_for_career_stage(current_percentiles, career_stage)
+        target_expected, target_target = self._adjust_for_career_stage(target_percentiles, career_stage)
+        
+        # Generate side-by-side comparison histogram
+        comparison_histogram = self._generate_comparison_histogram(
+            current_percentiles, target_percentiles,
+            current_expected, target_expected,
+            normalized_role, normalized_current_loc, normalized_target_loc
+        )
+        
+        # Calculate potential gain from relocation
+        relocation_gain = target_expected - current_expected
+        relocation_gain_percent = (relocation_gain / current_expected * 100) if current_expected > 0 else 0
+        
+        return {
+            'available': True,
+            'role': role,
+            'normalized_role': normalized_role.title(),
+            'current_location': current_location,
+            'target_location': target_location,
+            'normalized_current_location': normalized_current_loc,
+            'normalized_target_location': normalized_target_loc,
+            'current_salary_expected': int(current_expected),
+            'target_salary_expected': int(target_expected),
+            'relocation_gain': int(relocation_gain),
+            'relocation_gain_percent': int(relocation_gain_percent),
+            'current_market_percentiles': {
+                '10th': int(current_percentiles[0]),
+                '25th': int(current_percentiles[1]),
+                'median': int(current_percentiles[2]),
+                '75th': int(current_percentiles[3]),
+                '90th': int(current_percentiles[4]),
+            },
+            'target_market_percentiles': {
+                '10th': int(target_percentiles[0]),
+                '25th': int(target_percentiles[1]),
+                'median': int(target_percentiles[2]),
+                '75th': int(target_percentiles[3]),
+                '90th': int(target_percentiles[4]),
+            },
+            'comparison_histogram_base64': comparison_histogram,
+            'data_source': self.data_source,
+            'career_stage': career_stage,
+            'alignment_score': alignment_score,
+        }
+    
+    def _generate_comparison_histogram(
+        self,
+        current_percentiles: List[int],
+        target_percentiles: List[int],
+        current_expected: float,
+        target_expected: float,
+        role: str,
+        current_location: str,
+        target_location: str
+    ) -> str:
+        """Generate side-by-side comparison of salary distributions"""
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+        
+        # Helper function to create distribution
+        def create_distribution(percentiles):
+            salaries = []
+            bins = [
+                (percentiles[0], percentiles[1], 0.15),
+                (percentiles[1], percentiles[2], 0.25),
+                (percentiles[2], percentiles[3], 0.25),
+                (percentiles[3], percentiles[4], 0.15),
+            ]
+            for start, end, weight in bins:
+                n_samples = int(weight * 1000)
+                salaries.extend(np.linspace(start, end, n_samples))
+            return salaries
+        
+        # Plot current location
+        current_salaries = create_distribution(current_percentiles)
+        ax1.hist(
+            current_salaries,
+            bins=30,
+            color='#3B82F6',
+            alpha=0.6,
+            edgecolor='black',
+            label='Market Distribution'
+        )
+        ax1.axvline(
+            current_expected,
+            color='#EF4444',
+            linestyle='--',
+            linewidth=2.5,
+            label=f'Your Expected: ${int(current_expected)}K'
+        )
+        
+        # Add percentile markers for current
+        for pct_name, pct_value in [('P25', current_percentiles[1]), ('Median', current_percentiles[2]), ('P75', current_percentiles[3])]:
+            ax1.axvline(pct_value, color='gray', linestyle=':', linewidth=1, alpha=0.5)
+            ax1.text(pct_value, ax1.get_ylim()[1] * 0.85, pct_name, 
+                    ha='center', fontsize=9, color='gray')
+        
+        ax1.set_xlabel('Annual Salary (thousands USD)', fontsize=11, fontweight='bold')
+        ax1.set_ylabel('Frequency', fontsize=11, fontweight='bold')
+        ax1.set_title(
+            f'Current Location\n{role.title()} in {current_location}',
+            fontsize=12,
+            fontweight='bold',
+            color='#1F2937'
+        )
+        ax1.legend(loc='upper right', fontsize=9)
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # Plot target location
+        target_salaries = create_distribution(target_percentiles)
+        ax2.hist(
+            target_salaries,
+            bins=30,
+            color='#10B981',
+            alpha=0.6,
+            edgecolor='black',
+            label='Market Distribution'
+        )
+        ax2.axvline(
+            target_expected,
+            color='#EF4444',
+            linestyle='--',
+            linewidth=2.5,
+            label=f'Your Expected: ${int(target_expected)}K'
+        )
+        
+        # Add percentile markers for target
+        for pct_name, pct_value in [('P25', target_percentiles[1]), ('Median', target_percentiles[2]), ('P75', target_percentiles[3])]:
+            ax2.axvline(pct_value, color='gray', linestyle=':', linewidth=1, alpha=0.5)
+            ax2.text(pct_value, ax2.get_ylim()[1] * 0.85, pct_name, 
+                    ha='center', fontsize=9, color='gray')
+        
+        ax2.set_xlabel('Annual Salary (thousands USD)', fontsize=11, fontweight='bold')
+        ax2.set_ylabel('Frequency', fontsize=11, fontweight='bold')
+        ax2.set_title(
+            f'Target Location\n{role.title()} in {target_location}',
+            fontsize=12,
+            fontweight='bold',
+            color='#1F2937'
+        )
+        ax2.legend(loc='upper right', fontsize=9)
+        ax2.grid(axis='y', alpha=0.3)
+        
+        # Add overall title with data source
+        gain = target_expected - current_expected
+        gain_pct = (gain / current_expected * 100) if current_expected > 0 else 0
+        gain_text = f"(+${int(gain)}K, +{int(gain_pct)}%)" if gain > 0 else f"(${int(gain)}K, {int(gain_pct)}%)"
+        
+        fig.suptitle(
+            f'Salary Comparison: {role.title()} - Current vs Target Location {gain_text}\nData Source: {self.data_source}',
+            fontsize=14,
+            fontweight='bold',
+            y=0.98
+        )
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
+        plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+        buffer.seek(0)
+        image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+        plt.close(fig)
+        
+        return image_base64
 
 
-# Convenience function
+# Convenience functions
 def get_salary_analysis(role: str, location: str, career_stage: str, alignment_score: int) -> Dict:
     """Get salary analysis for given parameters"""
     analyzer = SalaryAnalyzer()
     return analyzer.analyze_salary(role, location, career_stage, alignment_score)
+
+def get_salary_comparison(role: str, current_location: str, target_location: str, career_stage: str, alignment_score: int) -> Dict:
+    """Get salary comparison between current and target locations"""
+    analyzer = SalaryAnalyzer()
+    return analyzer.analyze_salary_comparison(role, current_location, target_location, career_stage, alignment_score)
