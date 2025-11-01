@@ -289,7 +289,7 @@ class SalaryAnalyzer:
             color='#EF4444', 
             linestyle='--', 
             linewidth=2.5,
-            label=f'Your Expected: ${int(current_expected)}K'
+            label=f'Your Current Expected (Based on Experience): ${int(current_expected)}K'
         )
         
         ax.axvline(

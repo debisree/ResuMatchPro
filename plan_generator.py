@@ -263,6 +263,7 @@ class ImprovementPlanGenerator:
         is_relocation = current_location != target_location
         is_domain_change = current_domain != target_domain if current_domain and target_domain else False
         is_pivot = career_goal == "pivot"
+        is_lateral = career_goal == "lateral_move"
         
         # Immediate actions (0-1 month) - Career goal specific
         timeline['immediate'].append("Update resume with quantified achievements and ATS-friendly formatting. Get it reviewed by 2-3 professionals")
@@ -270,6 +271,9 @@ class ImprovementPlanGenerator:
         if is_pivot:
             timeline['immediate'].append(f"Research {target_domain or 'target domain'} industry: read 5-10 industry reports, follow key influencers, join domain-specific communities")
             timeline['immediate'].append("Reframe existing experience to highlight transferable skills relevant to new career path")
+        elif is_lateral:
+            timeline['immediate'].append(f"Research {target_domain or 'target domain'} industry: understand key players, trends, and how your current skills translate")
+            timeline['immediate'].append("Highlight transferable skills and domain-agnostic achievements (e.g., scalability, performance optimization, problem-solving)")
         else:
             timeline['immediate'].append("Optimize LinkedIn profile showcasing readiness for promotion to next level with leadership achievements")
         
@@ -300,6 +304,10 @@ class ImprovementPlanGenerator:
         if is_pivot:
             timeline['short_term'].append("Build transitional narrative: create compelling story explaining career pivot, emphasizing transferable skills and genuine interest")
             timeline['short_term'].append("Seek mentorship from 2-3 professionals who successfully made similar career transitions")
+        elif is_lateral:
+            timeline['short_term'].append(f"Build domain-specific portfolio: create 2-3 projects solving {target_domain or 'target industry'} problems using your existing technical skills")
+            timeline['short_term'].append(f"Network with professionals in {target_domain or 'target domain'}: conduct 5-8 informational interviews to understand industry expectations")
+            timeline['short_term'].append("Emphasize consistency: maintain same seniority level while demonstrating domain adaptability through relevant projects")
         else:
             timeline['short_term'].append("Demonstrate leadership: lead initiatives, mentor others, take on stretch assignments to showcase promotion readiness")
         
@@ -315,6 +323,10 @@ class ImprovementPlanGenerator:
         if is_pivot:
             timeline['long_term'].append(f"Establish credibility in {target_domain or 'new field'}: publish 5-8 industry-specific articles/case studies, speak at domain conferences")
             timeline['long_term'].append("Complete career transition: secure role in new field, leverage transferable skills while continuing to build domain expertise")
+        elif is_lateral:
+            timeline['long_term'].append(f"Become domain expert: publish 3-5 technical articles about applying your skills to {target_domain or 'target industry'} challenges")
+            timeline['long_term'].append(f"Secure lateral move: target companies in {target_domain or 'target domain'} where your technical expertise is valued at same seniority level")
+            timeline['long_term'].append("Position as domain switcher: show you bring fresh perspective from previous domain while understanding new industry context")
         else:
             timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
             timeline['long_term'].append("Position for promotion: take ownership of high-impact projects, demonstrate strategic thinking and leadership capabilities")
