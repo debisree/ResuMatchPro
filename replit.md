@@ -56,6 +56,13 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-11-01: **💰 Side-by-Side Salary Comparison** - Enhanced salary analysis with location comparison:
+  - **Current vs Target Location Salary Distributions:** Side-by-side histogram showing salary ranges for target role in both locations
+  - **Relocation Impact Analysis:** Clear display of salary gain/loss when moving between locations
+  - **Market Percentiles for Both Locations:** Shows 25th, Median, 75th, 90th percentiles for current and target locations
+  - **Data Source Citation:** BLS (U.S. Bureau of Labor Statistics) May 2024 data clearly cited in histogram and results page
+  - **Visual Comparison:** Blue histogram for current location, green for target location, with user's expected salary marked in both
+  - Replaced single-location analysis with comprehensive comparison showing financial impact of location change
 - 2025-11-01: **⏰ 6-Month Timeline Fix & Alignment UI Clarity** - Improved timeline accuracy and target role display:
   - **6-month timeline now shows ONLY 6-month suggestions:** Long-term (6-12 month) section completely removed for 6-month plans
   - Early return logic ensures 12-month advice never executes for 6-month timelines
