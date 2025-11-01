@@ -224,4 +224,4 @@ Using `sample_resume.txt`:
 
 ## License
 
-Built for Replit - Educational/Portfolio Project
+@Debisree Educational/Portfolio Project
