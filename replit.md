@@ -3,21 +3,33 @@
 ## Overview
 A comprehensive web application that analyzes resume quality and provides actionable insights to help users match their resumes to their target roles. Built with FastAPI backend and HTMX + Tailwind frontend.
 
+**Architecture:** Hybrid AI + Rule-Based System (see [ARCHITECTURE.md](ARCHITECTURE.md) for technical details)
+
 ## Features
 - **Session-based Authentication**: Username login or guest access with session cookies
 - **Resume Upload & Parsing**: Supports PDF, DOCX, and TXT formats (max 5MB)
-- **Rule-based Analysis Engine**: Comprehensive scoring across 4 categories (0-120 total)
-  - Completeness (contact info, sections, length)
-  - Summary Quality (coverage, concision, specificity, impact, evidence)
-  - Education (degrees, years, thesis, GPA/honors)
-  - Employment (bullets, quantification, experience years)
-- **ATS Readiness Checks**: Detects formatting issues, missing sections, non-ASCII characters
-- **Role Alignment**: Scores resume against target job role vocabulary
-- **Career Stage Detection**: Student / Recent Graduate / Mid-Level / Senior
-- **1-Year Improvement Plan**: Rule-based plan with quarterly milestones
-- **Optional Gemini AI Enhancement**: Refines plans and generates tailored keywords when GOOGLE_API_KEY is set
-- **Report Downloads**: JSON and PDF exports
+- **Hybrid Analysis Engine**: Combines Gemini 2.0 Pro AI with rule-based checks (0-120 total score)
+  - **Content Quality (30 pts)**: Rule-based section detection and completeness checks
+  - **ATS Readiness (30 pts)**: Rule-based formatting and keyword optimization
+  - **Impact & Metrics (30 pts)**: Hybrid AI + rule-based quantification analysis
+  - **Role Alignment (30 pts)**: Gemini AI semantic matching with keyword fallback
+- **Gemini 2.0 Pro AI Features**:
+  - Semantic role alignment scoring (understands context, not just keywords)
+  - Intelligent gap analysis (identifies missing skills with reasoning)
+  - Personalized improvement plan generation with detailed roadmaps
+  - Automatic fallback to rule-based analysis if API unavailable
+- **Career Planning System**: Goal-based roadmap with location and domain targeting
+  - Career goals: Promotion / Lateral Move / Career Pivot
+  - Timeframe selection: 6 months or 1 year
+  - Domain specialization support
+- **Salary Analysis**: BLS-powered location comparison
+  - Side-by-side histograms (current vs target location)
+  - Relocation impact analysis with percentile distributions
+  - 10 major U.S. cities + Remote option
+- **Report Downloads**: JSON and PDF exports with charts
 - **Session History**: Last 5 analyses per session
+
+**For technical documentation:** See [ARCHITECTURE.md](ARCHITECTURE.md) for details on AI vs rule-based components, scoring algorithms, and system design.
 
 ## Project Structure
 ```
