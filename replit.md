@@ -56,12 +56,20 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-11-01: **🔄 Lateral Move Career Path** - Added third career goal option:
+  - New career goal: "Lateral Move (Same level, different domain)" for domain switching without level change
+  - **Three career paths now supported:**
+    1. **Promotion** → Advance to next level in current field
+    2. **Lateral Move** → Same level, switch domain (e.g., Mid SWE E-commerce → Mid SWE Fintech)
+    3. **Pivot** → Complete role/industry change
+  - Lateral move advice focuses on domain adaptation, transferable skills, maintaining seniority
+  - Enhanced histogram label: "Your Current Expected (Based on Experience)" to clarify career-stage-based calculation
 - 2025-10-31: **🎯 Career Goal Planning System** - Personalized roadmap based on career aspirations:
-  - Added Career Goals panel with required fields: goal type (Promotion/Pivot), target location, timeframe (6 months/1 year)
+  - Added Career Goals panel with required fields: goal type, target location, timeframe (6 months/1 year)
   - Changed location to fixed dropdown with 10 options (NYC/NJ, SFO, LA, San Diego, Boston, DC, Raleigh/Durham, Houston, Dallas, Austin)
   - Added domain field for industry specialization (e.g., "Data Science in Fintech")
   - Enhanced improvement plan with targeted suggestions based on:
-    - **Promotion vs Pivot**: Different advice for climbing ladder vs changing careers
+    - **Career Goal Type**: Different advice for promotion/lateral/pivot paths
     - **Relocation**: Location-specific networking and job market research if moving cities
     - **Domain Change**: Industry-specific projects and certifications when switching domains
     - **Timeframe**: Accelerated advice for 6-month timeline vs standard 12-month pacing
