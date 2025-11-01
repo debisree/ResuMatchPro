@@ -56,6 +56,13 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-11-01: **🚀 Upgraded to Gemini 2.0 Pro** - Enhanced AI analysis quality:
+  - **Gemini 2.0 Pro Experimental:** Upgraded both Resume Analyzer and Plan Generator to use Google's most capable model
+  - **Better reasoning:** Enhanced complex prompt handling and deeper analysis
+  - **Improved coding recommendations:** Best-in-class coding performance for technical role analysis
+  - **2M token context:** Can analyze larger documents and provide more detailed recommendations
+  - More accurate role alignment scoring with semantic understanding
+  - Higher quality improvement plan generation with detailed, structured advice
 - 2025-11-01: **💰 Side-by-Side Salary Comparison** - Enhanced salary analysis with location comparison:
   - **Current vs Target Location Salary Distributions:** Side-by-side histogram showing salary ranges for target role in both locations
   - **Relocation Impact Analysis:** Clear display of salary gain/loss when moving between locations

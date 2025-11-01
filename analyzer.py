@@ -50,7 +50,7 @@ class ResumeAnalyzer:
         if self.gemini_available:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+                self.model = genai.GenerativeModel('gemini-2.0-pro-exp')
             except Exception:
                 self.gemini_available = False
     
