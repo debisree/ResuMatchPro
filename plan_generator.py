@@ -317,7 +317,7 @@ class ImprovementPlanGenerator:
         if career_stage in ["Student", "Recent Graduate"]:
             timeline['short_term'].append("Build strong foundation in core technologies through structured courses and hands-on practice (20+ hours/week)")
         
-        # For 6-month timeline, add closing actions to short-term and skip long-term
+        # For 6-month timeline, add closing actions to short-term and return WITHOUT long-term
         if timeframe == 6:
             timeline['short_term'].append("⏰ 6-month accelerated timeline: Intensify efforts - dedicate 15-20 hours/week to upskilling, networking, and applications")
             timeline['short_term'].append("Target 40-50 quality applications over next 4-5 months with systematic follow-ups")
@@ -328,34 +328,34 @@ class ImprovementPlanGenerator:
             else:
                 timeline['short_term'].append("Parallel track: continue skill building while actively applying - demonstrate learning trajectory during interviews")
             
-            # DO NOT populate long_term for 6-month timeline
+            # Explicitly ensure long_term stays empty for 6-month timeline
             timeline['long_term'] = []
+            return timeline  # Early return - DO NOT execute 12-month logic
         
-        # Long-term actions (6-12 months) - ONLY for 12-month timeline
+        # Long-term actions (6-12 months) - ONLY executed for 12-month timeline
+        timeline['long_term'].append("Achieve measurable expertise: portfolio with 5-6 production-quality projects, 2-3 certifications, strong GitHub presence")
+        
+        if is_pivot:
+            timeline['long_term'].append(f"Establish credibility in {target_domain or 'new field'}: publish 5-8 industry-specific articles/case studies, speak at domain conferences")
+            timeline['long_term'].append("Complete career transition: secure role in new field, leverage transferable skills while continuing to build domain expertise")
+        elif is_lateral:
+            timeline['long_term'].append(f"Become domain expert: publish 3-5 technical articles about applying your skills to {target_domain or 'target industry'} challenges")
+            timeline['long_term'].append(f"Secure lateral move: target companies in {target_domain or 'target domain'} where your technical expertise is valued at same seniority level")
+            timeline['long_term'].append("Position as domain switcher: show you bring fresh perspective from previous domain while understanding new industry context")
         else:
-            timeline['long_term'].append("Achieve measurable expertise: portfolio with 5-6 production-quality projects, 2-3 certifications, strong GitHub presence")
-            
-            if is_pivot:
-                timeline['long_term'].append(f"Establish credibility in {target_domain or 'new field'}: publish 5-8 industry-specific articles/case studies, speak at domain conferences")
-                timeline['long_term'].append("Complete career transition: secure role in new field, leverage transferable skills while continuing to build domain expertise")
-            elif is_lateral:
-                timeline['long_term'].append(f"Become domain expert: publish 3-5 technical articles about applying your skills to {target_domain or 'target industry'} challenges")
-                timeline['long_term'].append(f"Secure lateral move: target companies in {target_domain or 'target domain'} where your technical expertise is valued at same seniority level")
-                timeline['long_term'].append("Position as domain switcher: show you bring fresh perspective from previous domain while understanding new industry context")
-            else:
-                timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
-                timeline['long_term'].append("Position for promotion: take ownership of high-impact projects, demonstrate strategic thinking and leadership capabilities")
-            
-            if is_relocation:
-                timeline['long_term'].append(f"Execute relocation to {target_location}: secure job offer, plan move logistics, establish connections before relocating")
-            
-            timeline['long_term'].append("Expand to 50-70 total applications with systematic follow-ups. Convert at least 10% to interviews")
-            timeline['long_term'].append("Secure multiple offers through strategic networking and strong technical interviews. Negotiate compensation package")
-            
-            if alignment_score >= 70:
-                timeline['long_term'].append("Focus on interview preparation and applications - you're already well-qualified, now it's about landing the right opportunity")
-            else:
-                timeline['long_term'].append("Continue skill building while applying - demonstrate learning trajectory and growth mindset during interviews")
+            timeline['long_term'].append("Establish thought leadership: publish 10-15 technical blog posts, give 2-3 talks at meetups, mentor 2-3 people")
+            timeline['long_term'].append("Position for promotion: take ownership of high-impact projects, demonstrate strategic thinking and leadership capabilities")
+        
+        if is_relocation:
+            timeline['long_term'].append(f"Execute relocation to {target_location}: secure job offer, plan move logistics, establish connections before relocating")
+        
+        timeline['long_term'].append("Expand to 50-70 total applications with systematic follow-ups. Convert at least 10% to interviews")
+        timeline['long_term'].append("Secure multiple offers through strategic networking and strong technical interviews. Negotiate compensation package")
+        
+        if alignment_score >= 70:
+            timeline['long_term'].append("Focus on interview preparation and applications - you're already well-qualified, now it's about landing the right opportunity")
+        else:
+            timeline['long_term'].append("Continue skill building while applying - demonstrate learning trajectory and growth mindset during interviews")
         
         return timeline
     

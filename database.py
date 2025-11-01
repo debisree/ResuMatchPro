@@ -85,7 +85,7 @@ class Database:
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT scores_json, target_role, filename, created_at
+            SELECT scores_json, target_role, filename, created_at, seniority_goal
             FROM analyses
             WHERE id = ?
         ''', (analysis_id,))
@@ -98,6 +98,7 @@ class Database:
             analysis['id'] = analysis_id
             analysis['filename'] = row[2]
             analysis['created_at'] = row[3]
+            analysis['seniority_goal'] = row[4]  # Add seniority_goal to analysis
             return analysis
         
         return None
