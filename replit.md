@@ -56,6 +56,14 @@ A comprehensive web application that analyzes resume quality and provides action
 - `PORT` (default: 5000) - Server port
 
 ## Recent Changes
+- 2025-11-01: **⏰ 6-Month Timeline Fix & Alignment UI Clarity** - Improved timeline accuracy and target role display:
+  - **6-month timeline now shows ONLY 6-month suggestions:** Long-term (6-12 month) section completely removed for 6-month plans
+  - Early return logic ensures 12-month advice never executes for 6-month timelines
+  - Dynamic heading: "6-Month Improvement Plan" vs "1-Year Improvement Plan" based on user selection
+  - **Enhanced alignment score display:** Clearly shows "Alignment with Your Intended Role" (not current role)
+  - Detailed target info display: Shows seniority level, domain, and career goal type in alignment section
+  - Fixed database to fetch and display seniority_goal in results
+  - Career goal labels: "Promotion (Advance Level)", "Lateral Move (Same Level, Different Domain)", "Career Pivot (Complete Change)"
 - 2025-11-01: **🔄 Lateral Move Career Path** - Added third career goal option:
   - New career goal: "Lateral Move (Same level, different domain)" for domain switching without level change
   - **Three career paths now supported:**
