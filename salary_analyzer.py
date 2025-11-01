@@ -361,9 +361,9 @@ class SalaryAnalyzer:
         
         role_data = SALARY_DATABASE[normalized_role]
         
-        # Get percentiles for both locations
-        current_percentiles = role_data.get(normalized_current_loc, role_data.get('Austin'))
-        target_percentiles = role_data.get(normalized_target_loc, role_data.get('Austin'))
+        # Get percentiles for both locations with fallback
+        current_percentiles = role_data.get(normalized_current_loc) or role_data.get('Austin') or [70, 90, 115, 145, 180]
+        target_percentiles = role_data.get(normalized_target_loc) or role_data.get('Austin') or [70, 90, 115, 145, 180]
         
         # Calculate expected salaries for both locations
         current_expected, current_target = self._adjust_for_career_stage(current_percentiles, career_stage)
@@ -524,7 +524,7 @@ class SalaryAnalyzer:
         
         # Convert to base64
         buffer = io.BytesIO()
-        plt.tight_layout(rect=[0, 0, 1, 0.95])
+        plt.tight_layout(rect=(0, 0, 1, 0.95))
         plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.read()).decode('utf-8')

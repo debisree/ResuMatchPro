@@ -14,7 +14,7 @@ from analyzer import ResumeAnalyzer
 from plan_generator import ImprovementPlanGenerator
 from database import Database
 from report_generator import ReportGenerator
-from salary_analyzer import get_salary_analysis
+from salary_analyzer import get_salary_analysis, get_salary_comparison
 
 app = FastAPI(title="ResuMatch")
 
@@ -199,17 +199,18 @@ async def analyze_resume(
         keywords = plan.get('gemini_keywords') or analyzer.generate_tailored_keywords()
         analysis_result['tailored_keywords'] = keywords
         
-        # Add salary analysis
+        # Add salary comparison (current vs target location)
         try:
-            salary_analysis = get_salary_analysis(
+            salary_comparison = get_salary_comparison(
                 role=display_role,
-                location=location.strip(),
+                current_location=location.strip(),
+                target_location=target_location.strip(),
                 career_stage=analysis_result['career_stage'],
                 alignment_score=analysis_result['role_alignment']['score']
             )
-            analysis_result['salary_analysis'] = salary_analysis
+            analysis_result['salary_analysis'] = salary_comparison
         except Exception as e:
-            print(f"Salary analysis failed: {e}")
+            print(f"Salary comparison failed: {e}")
             analysis_result['salary_analysis'] = {'available': False, 'message': 'Salary data temporarily unavailable'}
         
         analysis_id = db.save_analysis(
